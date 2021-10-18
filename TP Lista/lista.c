@@ -1,8 +1,5 @@
 #include "lista.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 typedef struct nodo{
     void* dato;
     struct nodo* prox;
@@ -75,7 +72,7 @@ bool lista_insertar_ultimo(lista_t *lista, void *dato){
 }
 
 void *lista_borrar_primero(lista_t *lista){
-    if(lista_esta_vacia) return NULL;
+    if(lista_esta_vacia(lista)) return NULL;
 
     void* dato = lista->prim->dato;
     nodo_t* aux = lista->prim;
