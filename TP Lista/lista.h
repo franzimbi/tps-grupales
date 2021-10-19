@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 typedef struct lista lista_t;
+typedef struct lista_iter lista_iter_t;
 
 //crea una lista.
 //post: devuelve una lista vacia.
@@ -45,7 +46,7 @@ void *lista_ver_primero(const lista_t *lista);
 void *lista_ver_ultimo(const lista_t* lista);
 
 // Devuelve la cantidad de elementos en la lista.
-// Pre: la cola fue creada.
+// Pre: la lista fue creada.
 size_t lista_largo(const lista_t *lista);
 
 // Destruye la lista. Si se recibe la función destruir_dato por parámetro,
@@ -55,5 +56,18 @@ size_t lista_largo(const lista_t *lista);
 // Post: se eliminaron todos los elementos de la lista.
 void lista_destruir(lista_t *lista, void (*destruir_dato)(void *));
 
+//itera toda la lista aplicandole la funcion visitar elemento a elemento mientras
+//mientras que esta devuelva true. corta la iteracion al devolver false.
+//pre: la lista fue creada.
+//post: se le aplico visitar a todos los elementos iterados
+void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *extra);
+
+lista_iter_t *lista_iter_crear(lista_t *lista);
+bool lista_iter_avanzar(lista_iter_t *iter);
+void *lista_iter_ver_actual(const lista_iter_t *iter);
+bool lista_iter_al_final(const lista_iter_t *iter);
+void lista_iter_destruir(lista_iter_t *iter);
+bool lista_iter_insertar(lista_iter_t *iter, void *dato);
+void *lista_iter_borrar(lista_iter_t *iter);
 
 #endif

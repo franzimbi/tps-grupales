@@ -106,5 +106,13 @@ void lista_destruir(lista_t *lista, void (*destruir_dato)(void *)){
     }
 
     free(lista);
-
 }
+
+void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *extra){
+nodo_t* actual = lista->primero;
+while(actual!=NULL){
+    if(!visitar(actual->dato, extra))
+        return;
+}
+}
+
