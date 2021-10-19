@@ -33,12 +33,13 @@ lista_t* lista_crear(void){
 }
 
 bool lista_esta_vacia(const lista_t *lista){
-    return lista->largo == 0 ? true : false;
+    return lista->largo == 0;
 }
 
 bool lista_insertar_primero(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
-    if(nuevo_nodo==NULL) return false;
+    if(nuevo_nodo == NULL) return false;
+
     lista->largo++;
 
     if(lista_esta_vacia(lista)){
@@ -53,7 +54,8 @@ bool lista_insertar_primero(lista_t *lista, void *dato){
 
 bool lista_insertar_ultimo(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
-    if(nuevo_nodo==NULL) return false;
+    if(nuevo_nodo == NULL) return false;
+    
     lista->largo++;
 
     if(lista_esta_vacia(lista)){
@@ -61,6 +63,7 @@ bool lista_insertar_ultimo(lista_t *lista, void *dato){
         lista->ultimo = nuevo_nodo;
         return true;
     }
+
     lista->ultimo->proximo = nuevo_nodo;
     lista->ultimo = nuevo_nodo;
     return true;
@@ -101,6 +104,7 @@ void lista_destruir(lista_t *lista, void (*destruir_dato)(void *)){
         free(nodo);  
         nodo = siguiente_nodo;
     }
+
     free(lista);
 
 }
