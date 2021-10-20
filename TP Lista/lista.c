@@ -127,14 +127,19 @@ lista_iter_t *lista_iter_crear(lista_t *lista){
 
     iterador_creado->elemento_actual = lista->primero;
     iterador_creado->lista = lista;
-    iterador_creado->elemento_actual==lista->ultimo ? iterador_creado->esta_al_final=true : iterador_creado->esta_al_final=false;
 
+    if(iterador_creado->elemento_actual==lista->ultimo)
+        iterador_creado->esta_al_final=true;
+    else{
+        iterador_creado->esta_al_final=false;
+    }
     return iterador_creado;
 }
 
 bool lista_iter_avanzar(lista_iter_t *iter){
     if(lista_iter_al_final(iter)) return false;
     iter->elemento_actual = iter->elemento_actual->proximo;
+    if(iter->elemento_actual->proximo==NULL) iter->esta_al_final=true;
     return true;
 }
 
@@ -174,14 +179,18 @@ void *lista_iter_borrar(lista_iter_t *iter){
         iter->elemento_actual=iter->lista->primero;
         if(lista_esta_vacia(iter->lista)) iter->esta_al_final=true;
     }
-    if(iter->elemento_actual==iter->lista->ultimo){
+    if(lista_iter_al_final(iter)){
         void* dato=iter->elemento_actual->dato;
-        free(iter->elemento_actual);
-        iter->
+        lista_iter_t * iter_aux = lista_iter_crear(iter->lista);
+        if(iter_aux==NULL) return NULL;
+        while (iter_aux->elemento_actual->proximo)
+        {
+            /* code */
+        }
+        
     }
     else{
-        nuevo->proximo = iter->elemento_actual->proximo;
-        iter->elemento_actual->proximo = nuevo;
+    r->elemento_actual->proximo = nuevo;
         return true;
     }
 }
