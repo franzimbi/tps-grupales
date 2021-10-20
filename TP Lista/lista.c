@@ -5,11 +5,15 @@ typedef struct nodo{
     struct nodo* proximo;
 }nodo_t;
 
-typedef struct lista{
+struct lista{
     struct nodo* primero;
     struct nodo* ultimo;
     size_t largo;
-} lista_t;
+};
+
+struct lista_iter{
+    struct nodo* elemento_actual;
+};
 
 nodo_t* nodo_crear(void* dato){
     nodo_t* nodo = malloc(sizeof(nodo_t));
@@ -80,7 +84,6 @@ void *lista_borrar_primero(lista_t *lista){
     return dato;
 }
 
-
 void *lista_ver_primero(const lista_t *lista){
     return lista->largo == 0 ? NULL : lista->primero->dato;
 }
@@ -116,3 +119,36 @@ while(actual!=NULL){
 }
 }
 
+lista_iter_t *lista_iter_crear(lista_t *lista){
+    lista_iter_t* iterador_creado = malloc(sizeof(lista_iter_t));
+    if(iterador_creado==NULL) return NULL;
+
+    iterador_creado->elemento_actual = lista->primero;
+    return iterador_creado;
+}
+
+bool lista_iter_avanzar(lista_iter_t *iter){
+    if(iter->elemento_actual->proximo==NULL) return false;
+    iter->elemento_actual = iter->elemento_actual->proximo;
+    return true;
+}
+
+void *lista_iter_ver_actual(const lista_iter_t *iter){
+    if(iter->elemento_actual==NULL) return NULL;
+    return iter->elemento_actual->dato;
+}
+bool lista_iter_al_final(const lista_iter_t *iter){
+    return iter->elemento_actual->proximo == NULL;
+}
+
+void lista_iter_destruir(lista_iter_t *iter){
+    free(iter);
+}
+
+bool lista_iter_insertar(lista_iter_t *iter, void *dato){
+    nodo_t* nuevo = nodo_crear(dato);
+    if(nuevo==NULL) return false;
+
+    if()
+}
+void *lista_iter_borrar(lista_iter_t *iter);
