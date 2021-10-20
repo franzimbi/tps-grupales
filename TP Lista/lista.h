@@ -95,9 +95,9 @@ void lista_iter_destruir(lista_iter_t *iter);
 //post: se agrego el elemento nuevo y el iterador sigue en la misma posicion.
 bool lista_iter_insertar(lista_iter_t *iter, void *dato);
 
-//borra el elemento en la posicion actual de la lista.
+//borra el elemento en la posicion actual de la lista y lo devuelve.
 //pre: la lista y el iterador fueron creados.
-//post: se borro el elemento en el que estaba el iterador.
+//post: se borro el elemento de la lista y se devolvio.
 void *lista_iter_borrar(lista_iter_t *iter);
 
 #endif
