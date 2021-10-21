@@ -118,6 +118,7 @@ void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *e
     while(actual!=NULL){
         if(!visitar(actual->dato, extra))
             return;
+        actual = actual->proximo;
     }
 }
 
