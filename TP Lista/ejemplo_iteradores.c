@@ -47,6 +47,7 @@ void ejemplo_iteradores() {
     lista_t *super = lista_crear();
 
     lista_insertar_ultimo(super, "leche");
+
     lista_insertar_ultimo(super, "huevos");
     lista_insertar_ultimo(super, "pan");
     lista_insertar_ultimo(super, "mermelada");

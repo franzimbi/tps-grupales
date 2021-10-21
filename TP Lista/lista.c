@@ -46,32 +46,32 @@ bool lista_insertar_primero(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
     if(nuevo_nodo == NULL) return false;
 
-    lista->largo++;
-
     if(lista_esta_vacia(lista)){
         lista->primero = nuevo_nodo;
         lista->ultimo = nuevo_nodo;
+        lista->largo++;
         return true;
     }
     nuevo_nodo->proximo = lista->primero;
     lista->primero = nuevo_nodo;
+    lista->largo++;
     return true;
 }
 
 bool lista_insertar_ultimo(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
     if(nuevo_nodo == NULL) return false;
-    
-    lista->largo++;
 
     if(lista_esta_vacia(lista)){
         lista->primero = nuevo_nodo;
         lista->ultimo = nuevo_nodo;
+        lista->largo++;
         return true;
     }
 
     lista->ultimo->proximo = nuevo_nodo;
     lista->ultimo = nuevo_nodo;
+    lista->largo++;
     return true;
 }
 
@@ -82,7 +82,7 @@ void *lista_borrar_primero(lista_t *lista){
     nodo_t* aux = lista->primero;
     lista->primero = aux->proximo;
     free(aux);
-
+    lista->largo--;
     return dato;
 }
 
@@ -182,8 +182,4 @@ void *lista_iter_borrar(lista_iter_t *iter){
     iter->actual = iter->actual->proximo;
     free(aux);
     return dato;
-}
-
-int main(void){
-    return 0;
 }
