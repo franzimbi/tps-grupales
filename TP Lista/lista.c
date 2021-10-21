@@ -12,8 +12,8 @@ struct lista{
 };
 
 struct lista_iter{
-    struct nodo* elemento_actual;
-    bool esta_al_final;
+    struct nodo* actual;
+    struct nodo* anterior;
     struct lista* lista;
 };
 
@@ -114,40 +114,34 @@ void lista_destruir(lista_t *lista, void (*destruir_dato)(void *)){
 }
 
 void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *extra){
-nodo_t* actual = lista->primero;
-while(actual!=NULL){
-    if(!visitar(actual->dato, extra))
-        return;
-}
+    nodo_t* actual = lista->primero;
+    while(actual!=NULL){
+        if(!visitar(actual->dato, extra))
+            return;
+    }
 }
 
 lista_iter_t *lista_iter_crear(lista_t *lista){
     lista_iter_t* iterador_creado = malloc(sizeof(lista_iter_t));
     if(iterador_creado==NULL) return NULL;
 
-    iterador_creado->elemento_actual = lista->primero;
+    iterador_creado->actual = lista->primero;
+    iterador_creado->anterior = NULL;
     iterador_creado->lista = lista;
-
-    if(iterador_creado->elemento_actual==lista->ultimo)
-        iterador_creado->esta_al_final=true;
-    else{
-        iterador_creado->esta_al_final=false;
-    }
     return iterador_creado;
 }
 
 bool lista_iter_avanzar(lista_iter_t *iter){
     if(lista_iter_al_final(iter)) return false;
-    iter->elemento_actual = iter->elemento_actual->proximo;
-    if(iter->elemento_actual->proximo==NULL) iter->esta_al_final=true;
-    return true;
+    iter->anterior = iter->actual;
+    iter->actual = iter->actual->proximo;
 }
 
 void *lista_iter_ver_actual(const lista_iter_t *iter){
-    return iter->elemento_actual->dato;
+    return iter->actual->dato;
 }
 bool lista_iter_al_final(const lista_iter_t *iter){
-    return iter->esta_al_final;
+    return iter->actual==NULL;
 }
 
 void lista_iter_destruir(lista_iter_t *iter){
@@ -155,42 +149,36 @@ void lista_iter_destruir(lista_iter_t *iter){
 }
 
 bool lista_iter_insertar(lista_iter_t *iter, void *dato){
-    if(iter->elemento_actual==iter->lista->primero){
+    if(iter->actual==iter->lista->primero){
         if(!lista_insertar_primero(iter->lista, dato)) return false;
-        iter->elemento_actual=iter->lista->primero;
-        return true;
-    }
-    if(iter->elemento_actual==iter->lista->ultimo){
+        iter->actual = iter->lista->primero;
+        return true; 
+}
+    if(lista_iter_al_final(iter)){  
         if(!lista_insertar_ultimo(iter->lista, dato)) return false;
-        iter->elemento_actual=iter->lista->ultimo;
+        iter->anterior=iter->lista->ultimo;
         return true;
-    }
-        nodo_t* nuevo=nodo_crear(dato);
-        if(nuevo==NULL) return false;
-        nuevo->proximo = iter->elemento_actual->proximo;
-        iter->elemento_actual->proximo = nuevo;
-        iter->elemento_actual = nuevo;
-        return true;
-    }
+}
+    nodo_t* nuevo=nodo_crear(dato);
+    if(nuevo==NULL) return false;
+    nuevo->proximo=iter->actual;
+    iter->anterior->proximo=nuevo;
+    iter->actual=nuevo;
+    return true;
+}
 
 void *lista_iter_borrar(lista_iter_t *iter){
-    if(iter->elemento_actual==iter->lista->primero){
-        void* aux = lista_borrar_primero(iter->lista);
-        iter->elemento_actual=iter->lista->primero;
-        if(lista_esta_vacia(iter->lista)) iter->esta_al_final=true;
+    if(lista_iter_al_final(iter)) return NULL;
+    if(iter->actual==iter->lista->primero){
+        void* dato = lista_borrar_primero(iter->lista);
+        if(dato==NULL) return NULL;
+        iter->actual=iter->lista->primero;
+        return dato;
     }
-    if(lista_iter_al_final(iter)){
-        void* dato=iter->elemento_actual->dato;
-        lista_iter_t * iter_aux = lista_iter_crear(iter->lista);
-        if(iter_aux==NULL) return NULL;
-        while (iter_aux->elemento_actual->proximo)
-        {
-            /* code */
-        }
-        
-    }
-    else{
-    r->elemento_actual->proximo = nuevo;
-        return true;
-    }
+    
+    nodo_t* aux = iter->actual;
+    void* dato = aux->dato;
+    iter->actual = iter->actual->proximo;
+    free(aux);
+    return dato;
 }

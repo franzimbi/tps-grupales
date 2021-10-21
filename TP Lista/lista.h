@@ -68,15 +68,14 @@ void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *e
 //post: devuelve el iterador.
 lista_iter_t *lista_iter_crear(lista_t *lista);
 
-//avanza al siguiente elemento de la lista. si ya no puede avanzar devuelve false.
+//avanza al siguiente elemento de la lista y devuelve true. si ya no puede avanzar devuelve false.
 //pre: el iterador y la lista fueron creados.
 //post: el iterador avanzo al siguiente elemento o quedo en  el final.
 bool lista_iter_avanzar(lista_iter_t *iter);
 
-// Obtiene el valor del  elemento actual de la lista. Si la lista tiene
-// elementos, se devuelve el valor del primero, si está vacía devuelve NULL.
+// Obtiene el valor del  elemento actual de la lista. devuelve NULL si esta al final.
 // Pre: la lista y el iterador fueron creados.
-// Post: se devolvió el elemento actual de la lista, cuando no está vacía.
+// Post: se devolvió el elemento actual de la lista.
 void *lista_iter_ver_actual(const lista_iter_t *iter);
 
 //devuelve true si esta al final de la lista, sino devuelve false.
@@ -86,18 +85,20 @@ bool lista_iter_al_final(const lista_iter_t *iter);
 
 //destruye el iterador.
 //pre: la lista y el iterador fueron creados.
-//post: el iterador fue destruido.
+//post: el iterador fue destruido, la lista igual.
 void lista_iter_destruir(lista_iter_t *iter);
 
-//inserta un nuevo elemento en la posicion actual de la lista y devuelve true. si no se pudo
-//devuelve false.
+//inserta un nuevo elemento en la posicion actual de la lista y devuelve true. 
+//si no se pudo devuelve false.
 //pre: la lista y el iterador fueron creados.
-//post: se agrego el elemento nuevo y el iterador sigue en la misma posicion.
+//post: se agrego el elemento nuevo y el iterador apunt a a este nuevo elemento.
 bool lista_iter_insertar(lista_iter_t *iter, void *dato);
 
-//borra el elemento en la posicion actual de la lista y lo devuelve.
+//borra el elemento en la posicion actual de la lista y lo devuelve. si esta al
+// final de la lista devuelve NULL.
 //pre: la lista y el iterador fueron creados.
-//post: se borro el elemento de la lista y se devolvio.
+//post: se borro el elemento de la lista y se devolvio. el iterador ahora 
+//apunta al elemento siguiente del elemento borrado
 void *lista_iter_borrar(lista_iter_t *iter);
 
 #endif
