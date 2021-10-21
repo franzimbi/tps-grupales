@@ -57,8 +57,3 @@ void ejemplo_iteradores() {
 
     lista_destruir(super, NULL);
 }
-
-int main(){
-    ejemplo_iteradores();
-    return 0;
-}
