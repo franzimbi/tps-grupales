@@ -87,7 +87,8 @@ static void prueba_lista_insertar_borrar(){
 }
 
 static void prueba_lista_destruir_null(){
-    printf("\nINICIO PRUEBAS DESTRUIR LISTA CON NULL\n");
+    printf("\nINICIO DE PRUEBAS DESTRUIR LISTA CON NULL\n");
+
     lista_t* lista=lista_crear();
     print_test("crear lista", lista!=NULL);
 
@@ -103,14 +104,148 @@ static void prueba_lista_destruir_null(){
     lista_destruir(lista, NULL);
 }
 
-static void prueba_lista_iterador_interno(){
-    
+#define CANTIDAD_DATOS 4
+
+bool sumar_lista(int* elemento, int* extra) {
+    int aux = *extra + *elemento;
+    *extra = aux;
+    return true;  // seguir iterando
 }
 
+bool encontrar_ultimo_cero(int* elemento, int* extra){
+    if(*elemento == 0){
+        (*extra)++;
+        return true;
+    }
+    return false;
+}
+
+static void prueba_lista_iterador_interno(){
+    printf("\nINICIO DE PRUEBAS DEL ITERADOR INTERNO\n");
+    
+    lista_t* lista=lista_crear();
+    print_test("crear lista", lista!=NULL);
+
+    int datos[CANTIDAD_DATOS];
+    int resultado_real = 0;
+    int resultado_iterado=0;
+    int posicion_ultimo_cero = 0;
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        datos[i]=i;
+        print_test("crear un dato", datos[i]==i);
+        print_test("insertar el dato", lista_insertar_ultimo(lista, &datos[i]));
+        resultado_real+=datos[i];
+    }
+
+    lista_iterar(lista,(bool (*)(void *, void *)) sumar_lista, &resultado_iterado);
+    print_test("sumar datos con iterador interno", resultado_iterado==resultado_real);
+
+    printf("\nINICIO PRUEBAS CON CORTE\n");
+    print_test("cambiar los datos de la lista", true);
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        if(i<CANTIDAD_DATOS/2){
+            datos[i]=0;
+        }else{
+            datos[i]=1;
+        }
+    }
+    lista_iterar(lista, (bool (*)(void *, void *)) encontrar_ultimo_cero, &posicion_ultimo_cero);
+    print_test("verificar si el iterador interno corta con false", posicion_ultimo_cero== (CANTIDAD_DATOS)/2 );
+
+    print_test("destruir lista", lista!=NULL);
+    lista_destruir(lista, NULL);
+}
+
+static void prueba_lista_iterador_externo_loop(){
+    printf("\nINICIO DE PRUEBAS DEL ITERADOR EXTERNO\n");
+
+    lista_t* lista=lista_crear();
+    print_test("crear lista", lista!=NULL);
+
+    int datos[CANTIDAD_DATOS];
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        datos[i]=i;
+        lista_insertar_ultimo(lista, &datos[i]);
+    }
+    print_test("insertar datos en lista", true);
+
+    lista_iter_t* iterador=lista_iter_crear(lista);
+    print_test("crear iterador de la lista", iterador!=NULL);
+
+    printf("loopeando iterador hasta el final:\n");
+    int i=0;
+    while(!lista_iter_al_final(iterador)){
+        print_test("vericar que el primer dato", lista_iter_ver_actual(iterador)==&datos[i]);
+        print_test("avanzar iterador", lista_iter_avanzar(iterador));
+        i++;
+    }
+    printf("loop terminado\n");
+    print_test("verificar que iterador esta al final", lista_iter_al_final(iterador)==true);
+    print_test("verificar que no avanza mas", !lista_iter_avanzar(iterador));
+
+    print_test("destruir iterador", lista!=NULL);
+    lista_iter_destruir(iterador);
+    print_test("destruir lista", lista!=NULL);
+    lista_destruir(lista, NULL);
+}
+
+static void prueba_lista_iterador_externo_insertar_borrar(){
+    printf("\nINICIO DE PRUEBAS DEL ITERADOR EXTERNO\n");
+
+    lista_t* lista=lista_crear();
+    print_test("crear lista", lista!=NULL);
+    lista_iter_t* iterador=lista_iter_crear(lista);
+    print_test("crear iterador de la lista", iterador!=NULL);
+
+    print_test("verificar que iterador esta al final", lista_iter_al_final(iterador));
+
+    lista_t* datos[CANTIDAD_DATOS];
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        datos[i] = lista_crear();
+        if(datos[i]==NULL){
+            for(; i>0;--i){
+                lista_destruir(datos[i], (void (*)(void *)) lista_destruir);
+            }
+        printf("ERROR DE MEMORIA\n");
+        }
+    }
+    print_test("crear listas para insertar", true);
+
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        print_test("insertar dato", lista_iter_insertar(iterador, datos[i]));
+        print_test("verificar que actual sea el dato insertado", lista_iter_ver_actual(iterador)==datos[i]);
+    }
+
+    print_test("destruir iterador", lista!=NULL);
+    lista_iter_destruir(iterador);
+    iterador=lista_iter_crear(lista);
+    print_test("crear nuevo iterador de la lista", iterador!=NULL);
+
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        print_test("verificar actual del iterador sea el primero de la lista", lista_iter_ver_actual(iterador)==lista_ver_primero(lista));
+        lista_t* aux = lista_iter_ver_actual(iterador);
+        print_test("borrar actual con el iterador", lista_iter_borrar(iterador)==aux);
+    }
+    print_test("verificar que iterador esta al final", lista_iter_al_final(iterador));
+
+    print_test("volver a insertar datos", true);
+    for(int i=0; i<CANTIDAD_DATOS;i++){
+        lista_iter_insertar(iterador, datos[i]);
+    }
+    
+    print_test("destruir iterador", lista!=NULL);
+    lista_iter_destruir(iterador);
+
+    print_test("destruir lista", lista!=NULL);
+    lista_destruir(lista, (void (*)(void *))lista_destruir);
+}
 void pruebas_pila_estudiante(){
     prueba_lista_vacia();
     prueba_lista_insertar_borrar();
     prueba_lista_destruir_null();
+    prueba_lista_iterador_interno();
+    prueba_lista_iterador_externo_loop();
+    prueba_lista_iterador_externo_insertar_borrar();
 }
 
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.

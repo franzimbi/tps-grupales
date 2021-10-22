@@ -63,8 +63,8 @@ void lista_destruir(lista_t *lista, void (*destruir_dato)(void *));
 //post: se le aplico visitar a todos los elementos iterados
 void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *extra);
 
-//crea un iterador para una lista. este empieza en el primer elemento de la lista.
-//pre: la lista fue creada. y no puede ser modificada por fuera de las funciones
+//crea un iterador para una lista y lo devuelve. si falla devuelve NULL
+//pre: la lista fue creada. y no puede ser modificada por fuera de las funciones.
 //del iterador creado.
 //post: devuelve el iterador.
 lista_iter_t *lista_iter_crear(lista_t *lista);

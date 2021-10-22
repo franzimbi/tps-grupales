@@ -99,28 +99,13 @@ size_t lista_largo(const lista_t *lista){
 }
 
 void lista_destruir(lista_t *lista, void (*destruir_dato)(void *)){
-    printf("cantidad elementos: %zu\n", lista_largo(lista));
-   /* 
     while(lista->largo != 0){
         if(destruir_dato != NULL)
             destruir_dato(lista_borrar_primero(lista));
-    }
-
-    free(lista);
-    */
-
-   nodo_t* nodo = lista->primero;
-
-    while(nodo!= NULL){
-        if(destruir_dato != NULL){
-            destruir_dato(nodo->dato);
+        else{
+            lista_borrar_primero(lista);
         }
-        
-        nodo_t* aux = nodo->proximo;
-        free(nodo);  
-        nodo = aux;
     }
-
     free(lista);
 }
 
@@ -130,7 +115,6 @@ void lista_iterar(lista_t *lista, bool visitar(void *dato, void *extra), void *e
         if(!visitar(actual->dato, extra))
             return;
         actual = actual->proximo;
-        
     }
 }
 
@@ -145,13 +129,15 @@ lista_iter_t *lista_iter_crear(lista_t *lista){
 }
 
 bool lista_iter_avanzar(lista_iter_t *iter){
-    if(lista_iter_al_final(iter)) return false;
+    if(lista_iter_al_final(iter))
+        return false;
     iter->anterior = iter->actual;
     iter->actual = iter->actual->proximo;
     return true;
 }
 
 void *lista_iter_ver_actual(const lista_iter_t *iter){
+    if(iter->actual==NULL) return NULL;
     return iter->actual->dato;
 }
 bool lista_iter_al_final(const lista_iter_t *iter){
@@ -178,6 +164,7 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
     nuevo->proximo=iter->actual;
     iter->anterior->proximo=nuevo;
     iter->actual=nuevo;
+    iter->lista->largo++;
     return true;
 }
 
@@ -194,5 +181,6 @@ void *lista_iter_borrar(lista_iter_t *iter){
     void* dato = aux->dato;
     iter->actual = iter->actual->proximo;
     free(aux);
+    iter->lista->largo--;
     return dato;
 }
