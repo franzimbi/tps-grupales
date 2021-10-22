@@ -239,7 +239,7 @@ static void prueba_lista_iterador_externo_insertar_borrar(){
     print_test("destruir lista", lista!=NULL);
     lista_destruir(lista, (void (*)(void *))lista_destruir);
 }
-void pruebas_pila_estudiante(){
+void pruebas_lista_estudiante(){
     prueba_lista_vacia();
     prueba_lista_insertar_borrar();
     prueba_lista_destruir_null();
@@ -251,7 +251,7 @@ void pruebas_pila_estudiante(){
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
 
 int main(void) {
-    pruebas_pila_estudiante();
+    pruebas_lista_estudiante();
     return failure_count() > 0;  // Indica si falló alguna prueba.
 }
 
