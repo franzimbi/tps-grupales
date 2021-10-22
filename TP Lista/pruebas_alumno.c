@@ -86,14 +86,32 @@ static void prueba_lista_insertar_borrar(){
     lista_destruir(lista, free);
 }
 
-//static void prueba_lista_varios
+static void prueba_lista_destruir_null(){
+    printf("\nINICIO PRUEBAS DESTRUIR LISTA CON NULL\n");
+    lista_t* lista=lista_crear();
+    print_test("crear lista", lista!=NULL);
 
+    int dato1 = 45;
+    float dato2 = 234.576f;
+    char dato3 = 'A';
+
+    print_test("insertar primero en la lista", lista_insertar_primero(lista, &dato1));
+    print_test("insertar primero en la lista", lista_insertar_primero(lista, &dato2));
+    print_test("insertar primero en la lista", lista_insertar_primero(lista, &dato3));
+
+    print_test("destruir lista", lista!=NULL);
+    lista_destruir(lista, NULL);
+}
+
+static void prueba_lista_iterador_interno(){
+    
+}
 
 void pruebas_pila_estudiante(){
     prueba_lista_vacia();
     prueba_lista_insertar_borrar();
+    prueba_lista_destruir_null();
 }
-
 
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
 
