@@ -42,7 +42,7 @@ void imprimir_iter_interno(lista_t *lista) {
 // Ejemplo de uso
 //
 
-
+/*
 void ejemplo_iteradores() {
     lista_t *super = lista_crear();
 
@@ -57,3 +57,4 @@ void ejemplo_iteradores() {
 
     lista_destruir(super, NULL);
 }
+*/

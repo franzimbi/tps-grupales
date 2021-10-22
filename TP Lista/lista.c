@@ -100,11 +100,27 @@ size_t lista_largo(const lista_t *lista){
 
 void lista_destruir(lista_t *lista, void (*destruir_dato)(void *)){
     printf("cantidad elementos: %zu\n", lista_largo(lista));
-    while(!lista_esta_vacia(lista)){
-        printf("aca\n");
+   /* 
+    while(lista->largo != 0){
         if(destruir_dato != NULL)
             destruir_dato(lista_borrar_primero(lista));
     }
+
+    free(lista);
+    */
+
+   nodo_t* nodo = lista->primero;
+
+    while(nodo!= NULL){
+        if(destruir_dato != NULL){
+            destruir_dato(nodo->dato);
+        }
+        
+        nodo_t* aux = nodo->proximo;
+        free(nodo);  
+        nodo = aux;
+    }
+
     free(lista);
 }
 

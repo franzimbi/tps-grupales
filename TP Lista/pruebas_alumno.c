@@ -52,37 +52,36 @@ static void prueba_lista_insertar_borrar(){
 
     print_test("ver si lista esta vacia", lista_esta_vacia(lista));
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==0);
-
-    print_test("insertar primero en la lista", lista_insertar_primero(lista, &dato1));
-    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==&dato1);
-    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==&dato1);
+    
+    print_test("insertar primero en la lista", lista_insertar_primero(lista, dato1));
+    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==dato1);
+    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==dato1);
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==1);
     print_test("ver si lista esta vacia", !lista_esta_vacia(lista));
-    print_test("borrar primero de la lista", lista_borrar_primero(lista)==&dato1);
+    print_test("borrar primero de la lista", lista_borrar_primero(lista)==dato1);
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==0);
     print_test("ver si lista esta vacia", lista_esta_vacia(lista));
-
-    print_test("volver a insertar elemento ultimo en la lista", lista_insertar_ultimo(lista, &dato1));
-    print_test("insertar 2do elemento ultimo en la lista", lista_insertar_ultimo(lista, &dato2));
-    print_test("insertar 3er elemento ultimo en la lista", lista_insertar_ultimo(lista, &dato3));
-    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==&dato1);
-    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==&dato3);
+    
+    print_test("volver a insertar elemento ultimo en la lista", lista_insertar_ultimo(lista, dato1));
+    print_test("insertar 2do elemento ultimo en la lista", lista_insertar_ultimo(lista, dato2));
+    print_test("insertar 3er elemento ultimo en la lista", lista_insertar_ultimo(lista, dato3));
+    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==dato1);
+    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==dato3);
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==3);
     print_test("ver si lista esta vacia", !lista_esta_vacia(lista));
-    print_test("borrar primero de la lista", lista_borrar_primero(lista)==&dato1);
-    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==&dato2);
+    print_test("borrar primero de la lista", lista_borrar_primero(lista)==dato1);
+    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==dato2);
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==2);
     print_test("ver si lista esta vacia", !lista_esta_vacia(lista));
-    print_test("borrar primero de la lista", lista_borrar_primero(lista)==&dato2);
-    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==&dato3);
-    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==&dato3);
-    print_test("borrar primero de la lista", lista_borrar_primero(lista)==&dato3);
+    print_test("borrar primero de la lista", lista_borrar_primero(lista)==dato2);
+    print_test("ver primer elemento de la lista", lista_ver_primero(lista)==dato3);
+    print_test("ver ultimo elemento de la lista", lista_ver_ultimo(lista)==dato3);
+    print_test("borrar primero de la lista", lista_borrar_primero(lista)==dato3);
     print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==0);
     print_test("ver si lista esta vacia", lista_esta_vacia(lista));
 
-    print_test("volver a insertar elementos a la lista", lista_insertar_ultimo(lista, &dato1) 
-    && lista_insertar_ultimo(lista, &dato2) && lista_insertar_ultimo(lista, &dato3));
-
+    print_test("volver a insertar elementos a la lista", lista_insertar_ultimo(lista, dato1) 
+    && lista_insertar_ultimo(lista, dato2) && lista_insertar_ultimo(lista, dato3));
     print_test("destruir lista", lista!=NULL);
     lista_destruir(lista, free);
 }
