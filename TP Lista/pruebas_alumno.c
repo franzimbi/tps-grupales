@@ -239,6 +239,62 @@ static void prueba_lista_iterador_externo_insertar_borrar(){
     print_test("destruir lista", lista!=NULL);
     lista_destruir(lista, (void (*)(void *))lista_destruir);
 }
+
+static void prueba_lista_iterador_externo_casos_medio(){
+    printf("\nPRUEBAS ITERADOR EXTERNO CON ELEMENTOS DEL MEDIO\n");
+
+    lista_t* lista=lista_crear();
+    print_test("crear lista", lista!=NULL);
+
+    int dato1 = 45;
+    float dato2 = 234.576f;
+    char dato3 = 'A';
+
+    print_test("insertar primero en la lista", lista_insertar_primero(lista, &dato1));
+    print_test("insertar primero en la lista", lista_insertar_ultimo(lista, &dato2));
+    print_test("insertar primero en la lista", lista_insertar_ultimo(lista, &dato3));
+    print_test("ver la cantidad de elementos de la lista", lista_largo(lista)==3);
+
+    lista_iter_t* iterador=lista_iter_crear(lista);
+    print_test("crear iterador de la lista", iterador!=NULL);
+
+    print_test("avanzar iterador", lista_iter_avanzar(iterador));
+    print_test("chequear actual", lista_iter_ver_actual(iterador)==&dato2);
+    print_test("borrar actual", lista_iter_borrar(iterador)==&dato2);
+    print_test("chequear actual", lista_iter_ver_actual(iterador)==&dato3);
+    print_test("avanzar iterador", lista_iter_avanzar(iterador));
+    print_test("avanzar iterador", !lista_iter_avanzar(iterador));
+
+    print_test("destruir iterador", lista!=NULL);
+    lista_iter_destruir(iterador);
+
+    print_test("chequear cantidad de elementos", lista_largo(lista)==2);
+
+    iterador=lista_iter_crear(lista);
+    print_test("crear otro iterador de la lista", iterador!=NULL);
+
+    print_test("chequear actual", lista_iter_ver_actual(iterador)==&dato1);
+    print_test("avanzar iterador", lista_iter_avanzar(iterador));
+    print_test("volver a insertar", lista_iter_insertar(iterador, &dato2));
+    print_test("chequear actual", lista_iter_ver_actual(iterador)==&dato2);
+    print_test("avanzar iterador", lista_iter_avanzar(iterador));
+
+    print_test("destruir iterador", lista!=NULL);
+    lista_iter_destruir(iterador);
+
+    print_test("chequear cantidad de elementos", lista_largo(lista)==3);
+    print_test("ver ultimo de la lista", lista_ver_ultimo(lista)==&dato3);
+    print_test("ver primero de la lista", lista_ver_primero(lista)==&dato1);
+
+    print_test("borrar primero", lista_borrar_primero(lista)==&dato1);
+    print_test("borrar primero", lista_borrar_primero(lista)==&dato2);
+    //print_test("borrar primero", lista_borrar_primero(lista)==&dato3);
+
+    print_test("chequear cantidad de elementos", lista_largo(lista)==0);
+    print_test("destruir lista", lista!=NULL);
+    lista_destruir(lista, NULL);
+
+}
 void pruebas_lista_estudiante(){
     prueba_lista_vacia();
     prueba_lista_insertar_borrar();
@@ -246,6 +302,7 @@ void pruebas_lista_estudiante(){
     prueba_lista_iterador_interno();
     prueba_lista_iterador_externo_loop();
     prueba_lista_iterador_externo_insertar_borrar();
+    prueba_lista_iterador_externo_casos_medio();
 }
 
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
