@@ -154,12 +154,14 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
         if(!lista_insertar_primero(iter->lista, dato)) return false;
         iter->actual = iter->lista->primero;
         return true; 
-}
+    }
+
     if(lista_iter_al_final(iter)){  
         if(!lista_insertar_ultimo(iter->lista, dato)) return false;
         iter->anterior=iter->lista->ultimo;
         return true;
-}
+    }
+    
     nodo_t* nuevo=nodo_crear(dato);
     if(nuevo==NULL) return false;
     nuevo->proximo=iter->actual;
@@ -182,6 +184,7 @@ void *lista_iter_borrar(lista_iter_t *iter){
     void* dato = aux->dato;
     iter->actual = iter->actual->proximo;
     free(aux);
+    iter->anterior->proximo = iter->actual;
     iter->lista->largo--;
     return dato;
 }
