@@ -158,7 +158,7 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
 
     if(lista_iter_al_final(iter)){  
         if(!lista_insertar_ultimo(iter->lista, dato)) return false;
-        iter->anterior=iter->lista->ultimo;
+        iter->actual=iter->lista->ultimo;
         return true;
     }
     
@@ -173,6 +173,7 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
 
 void *lista_iter_borrar(lista_iter_t *iter){
     if(lista_iter_al_final(iter)) return NULL;
+
     if(iter->actual==iter->lista->primero){
         void* dato = lista_borrar_primero(iter->lista);
         if(dato==NULL) return NULL;
@@ -185,6 +186,9 @@ void *lista_iter_borrar(lista_iter_t *iter){
     iter->actual = iter->actual->proximo;
     free(aux);
     iter->anterior->proximo = iter->actual;
+    if(iter->actual==NULL){
+        iter->lista->ultimo = iter->anterior;
+    }
     iter->lista->largo--;
     return dato;
 }
