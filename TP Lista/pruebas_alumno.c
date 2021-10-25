@@ -104,7 +104,7 @@ static void prueba_lista_destruir_null(){
     lista_destruir(lista, NULL);
 }
 
-#define CANTIDAD_DATOS 4
+#define CANTIDAD_DATOS 10000
 
 bool sumar_lista(int* elemento, int* extra) {
     int aux = *extra + *elemento;

@@ -47,14 +47,10 @@ bool lista_insertar_primero(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
     if(nuevo_nodo == NULL) return false;
 
-    if(lista_esta_vacia(lista)){
-        lista->primero = nuevo_nodo;
-        lista->ultimo = nuevo_nodo;
-        lista->largo++;
-        return true;
-    }
     nuevo_nodo->proximo = lista->primero;
     lista->primero = nuevo_nodo;
+    if(lista_esta_vacia(lista))
+        lista->ultimo = nuevo_nodo;
     lista->largo++;
     return true;
 }
@@ -63,14 +59,10 @@ bool lista_insertar_ultimo(lista_t *lista, void *dato){
     nodo_t* nuevo_nodo = nodo_crear(dato);
     if(nuevo_nodo == NULL) return false;
 
-    if(lista_esta_vacia(lista)){
+    if(lista_esta_vacia(lista))
         lista->primero = nuevo_nodo;
-        lista->ultimo = nuevo_nodo;
-        lista->largo++;
-        return true;
-    }
-
-    lista->ultimo->proximo = nuevo_nodo;
+    else
+        lista->ultimo->proximo = nuevo_nodo;
     lista->ultimo = nuevo_nodo;
     lista->largo++;
     return true;
@@ -84,15 +76,17 @@ void *lista_borrar_primero(lista_t *lista){
     lista->primero = aux->proximo;
     free(aux);
     lista->largo--;
+    if(lista_esta_vacia(lista))
+        lista->ultimo = NULL;
     return dato;
 }
 
 void *lista_ver_primero(const lista_t *lista){
-    return lista->largo == 0 ? NULL : lista->primero->dato;
+    return lista_esta_vacia(lista) ? NULL : lista->primero->dato;
 }
 
 void *lista_ver_ultimo(const lista_t* lista){
-    return lista->largo == 0 ? NULL : lista->ultimo->dato;
+    return lista_esta_vacia(lista) ? NULL : lista->ultimo->dato;
 }
 
 size_t lista_largo(const lista_t *lista){
@@ -138,8 +132,7 @@ bool lista_iter_avanzar(lista_iter_t *iter){
 }
 
 void *lista_iter_ver_actual(const lista_iter_t *iter){
-    if(iter->actual==NULL) return NULL;
-    return iter->actual->dato;
+    return lista_iter_al_final(iter) ? NULL : iter->actual->dato;
 }
 bool lista_iter_al_final(const lista_iter_t *iter){
     return iter->actual==NULL;
@@ -155,17 +148,11 @@ bool lista_iter_insertar(lista_iter_t *iter, void *dato){
         iter->actual = iter->lista->primero;
         return true; 
     }
-
-    if(lista_iter_al_final(iter)){  
-        if(!lista_insertar_ultimo(iter->lista, dato)) return false;
-        iter->actual=iter->lista->ultimo;
-        return true;
-    }
-    
     nodo_t* nuevo=nodo_crear(dato);
     if(nuevo==NULL) return false;
-    nuevo->proximo=iter->actual;
-    iter->anterior->proximo=nuevo;
+    nuevo->proximo = iter->actual;
+    if(iter->anterior!=NULL)
+        iter->anterior->proximo=nuevo;
     iter->actual=nuevo;
     iter->lista->largo++;
     return true;
