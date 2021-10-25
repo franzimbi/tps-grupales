@@ -2,6 +2,7 @@
 #include "testing.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 static void prueba_lista_vacia(){
@@ -302,6 +303,45 @@ static void prueba_lista_iterador_externo_casos_medio(){
     lista_destruir(lista, NULL);
 
 }
+
+static void pruebas_de_cantidad_lista_e_iterar(){
+    printf("PRUEBAS DE CANTIDAD LISTAS\n");
+
+    char** array = malloc(sizeof(char*) * CANTIDAD_DATOS );
+    if(array == NULL){
+        return;
+    }
+
+    for(int i = 0; i < CANTIDAD_DATOS; i++){
+        array[i]=malloc(sizeof(char) * 10);
+        strcpy(array[i], "test");
+    }
+
+    lista_t* lista = lista_crear();
+
+    printf("Empiezo a insertar elementos en la lista\n");
+    for(size_t i = 0; i < CANTIDAD_DATOS ; i++){
+        lista_insertar_primero(lista, array[i]);
+    }
+
+    printf("ITERO LA LISTA GRANDE CON UN ITERADOR");
+    lista_iter_t* iter = lista_iter_crear(lista);
+    while (lista_iter_al_final(iter)){
+        printf("Itero elemento\n");
+        lista_iter_avanzar(iter);
+    }
+
+    printf("destruyo el iterador\n");
+    lista_iter_destruir(iter);
+
+    free(array);
+    printf("Destruyo la lista\n");
+    lista_destruir(lista, free);
+    
+}
+
+
+
 void pruebas_lista_estudiante(){
     prueba_lista_vacia();
     prueba_lista_insertar_borrar();
@@ -310,6 +350,7 @@ void pruebas_lista_estudiante(){
     prueba_lista_iterador_externo_loop();
     prueba_lista_iterador_externo_insertar_borrar();
     prueba_lista_iterador_externo_casos_medio();
+    pruebas_de_cantidad_lista_e_iterar();
 }
 
 #ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.

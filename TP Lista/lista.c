@@ -173,7 +173,7 @@ void *lista_iter_borrar(lista_iter_t *iter){
     iter->actual = iter->actual->proximo;
     free(aux);
     iter->anterior->proximo = iter->actual;
-    if(iter->actual==NULL){
+    if(lista_iter_al_final(iter)){
         iter->lista->ultimo = iter->anterior;
     }
     iter->lista->largo--;
