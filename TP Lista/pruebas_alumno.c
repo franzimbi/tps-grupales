@@ -324,11 +324,12 @@ static void pruebas_de_cantidad_lista_e_iterar(){
         lista_insertar_primero(lista, array[i]);
     }
 
-    printf("ITERO LA LISTA GRANDE CON UN ITERADOR");
+    printf("ITERO LA LISTA GRANDE CON UN ITERADOR\n");
     lista_iter_t* iter = lista_iter_crear(lista);
-    while (lista_iter_al_final(iter)){
+
+    while (!lista_iter_al_final(iter)){
         printf("Itero elemento\n");
-        lista_iter_avanzar(iter);
+        print_test("AVANZÓ?:", lista_iter_avanzar(iter));
     }
 
     printf("destruyo el iterador\n");
