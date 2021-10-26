@@ -318,27 +318,28 @@ static void pruebas_de_cantidad_lista_e_iterar(){
     }
 
     lista_t* lista = lista_crear();
+    print_test("crear lista", lista!=NULL);
 
-    printf("Empiezo a insertar elementos en la lista\n");
     for(size_t i = 0; i < CANTIDAD_DATOS ; i++){
-        lista_insertar_primero(lista, array[i]);
+        print_test("insertar primero", lista_insertar_primero(lista, array[i]));
     }
 
-    printf("ITERO LA LISTA GRANDE CON UN ITERADOR\n");
+
     lista_iter_t* iter = lista_iter_crear(lista);
+    print_test("crear iterador de la lista", iter!=NULL);
 
+    printf("Iterando elementos:\n");
     while (!lista_iter_al_final(iter)){
-        printf("Itero elemento\n");
-        print_test("AVANZÓ?:", lista_iter_avanzar(iter));
+        
+        print_test("iter avanzar", lista_iter_avanzar(iter));
     }
 
-    printf("destruyo el iterador\n");
+    print_test("destuir iterador de la lista", true);
     lista_iter_destruir(iter);
 
     free(array);
-    printf("Destruyo la lista\n");
+    print_test("destruir la lista", true);
     lista_destruir(lista, free);
-    
 }
 
 
