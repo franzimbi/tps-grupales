@@ -7,9 +7,6 @@
 
 typedef enum {VACIO, OCUPADO, BORRADO} estado_t;
 
-static int ERROR_GLOBAL=0;
-
-
 typedef struct{
     char* clave;
     void* dato;
@@ -88,26 +85,36 @@ static bool redimensionar_hash(hash_t* hash){
     return true;
 }
 
-static bool intentar_guardar(size_t posicion, hash_t* hash, const char* clave, void* dato){
-    if(hash->tabla[posicion].estado==OCUPADO){
-        if(strcmp(hash->tabla[posicion].clave, clave)){
-            hash->tabla[posicion].dato = dato;
-            return true;
-        }
-    }if(hash->tabla[posicion].estado==VACIO || hash->tabla[posicion].estado==BORRADO){
-        hash->tabla[posicion].clave = malloc(sizeof(char)* (strlen(clave)+1));
-        if(hash->tabla[posicion].clave==NULL){
-            return false;
-        }
-        strcpy(hash->tabla[posicion].clave, clave);
-        hash->tabla[posicion].estado=OCUPADO;
-        hash->tabla[posicion].dato = dato;
-        hash->cantidad_elementos_acumulados++;
+static bool copiar_a_hash(size_t posicion, hash_t* hash, const char* clave, void* dato){
+    hash->tabla[posicion].clave = malloc(sizeof(char)* (strlen(clave)+1));
+    if(hash->tabla[posicion].clave==NULL) return false;
+
+    strcpy(hash->tabla[posicion].clave, clave);
+    hash->tabla[posicion].estado=OCUPADO;
+    hash->tabla[posicion].dato = dato;
+    hash->cantidad_elementos_acumulados++;
         hash->cantidad_elementos_reales++;
-        return true;
-    }
-    return false;
+    return true;
 }
+
+static size_t encontrar_posicion(size_t a, size_t b, size_t c, hash_t* hash, const char* clave){
+    if(hash->tabla[a].estado==OCUPADO)
+        if(strcmp(hash->tabla[a].clave, clave))
+            return a;
+    if(hash->tabla[b].estado==OCUPADO)
+        if(strcmp(hash->tabla[b].clave, clave))
+            return b;
+    if(hash->tabla[c].estado==OCUPADO)
+        if(strcmp(hash->tabla[c].clave, clave))
+            return c;
+    if(hash->tabla[a].estado==VACIO || hash->tabla[a].estado==BORRADO)
+        return a;
+    if(hash->tabla[b].estado==VACIO || hash->tabla[b].estado==BORRADO)
+        return b;
+    if(hash->tabla[c].estado==VACIO || hash->tabla[c].estado==BORRADO)
+        return c;
+}
+
 
 //------------------------------------------------------ FUNCIONES DEL TDA ----------------------------------------------------------------------
 
@@ -139,11 +146,12 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     if(((hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
         redimensionar_hash(hash);
 
-    if(intentar_guardar(hash1, hash, clave, dato)) return true;
-    if(intentar_guardar(hash2, hash, clave, dato)) return true;
-    if(intentar_guardar(hash3, hash, clave, dato)) return true;
+    size_t posicion = encontrar_posicion(hash1, hash2, hash3, hash, clave);
 
-    return false;
+    if(hash->tabla[posicion].estado==OCUPADO){
+        hash->tabla[posicion].dato = dato;
+    }else
+        return copiar_a_hash(posicion, hash, clave, dato);
 }
 
 void *hash_borrar(hash_t *hash, const char *clave){
