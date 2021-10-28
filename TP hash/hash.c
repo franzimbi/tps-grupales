@@ -69,20 +69,19 @@ static bool redimensionar_hash(hash_t* hash){
     for(size_t i=0; i<hash->tamano_tabla; i++){
         elemento_t aux = hash->tabla[i];
         if(aux.estado==OCUPADO){
-            size_t nro_hash = (size_t) jenkins_one_at_a_time_hash(aux.clave, hash->tamano_tabla);
-
-
+            size_t nro_hasheo = (size_t) jenkins_one_at_a_time_hash(aux.clave, hash->tamano_tabla);
+            
 
 
         hash->cantidad_elementos_acumulados++;
         }
     }
-    hash_destruir(hash->tabla);
+    //hash_destruir(hash->tabla);
     hash->tabla=tabla_nueva;
     return true;
 }
 
-static bool copiar_a_posicion_hash(size_t posicion, elemento_t* elemento, const char* clave, void* dato){
+static bool copiar_a_posicion_hash(elemento_t* elemento, const char* clave, void* dato){
     elemento->clave = malloc(sizeof(char)* (strlen(clave)+1));
     if(elemento->clave==NULL) return false;
 
@@ -139,8 +138,9 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     if(hash->tabla[nro_hasheo].estado==OCUPADO){
         hash->destructor(hash->tabla[nro_hasheo].dato);
         hash->tabla[nro_hasheo].dato = dato;
+        return true;
     }
-    if(!copiar_a_posicion_hash(nro_hasheo, hash, clave, dato)) return false;
+    if(!copiar_a_posicion_hash(&(hash->tabla[nro_hasheo]), clave, dato)) return false;
     hash->cantidad_elementos_acumulados++;
     hash->cantidad_elementos_reales++;
     return true;
@@ -149,7 +149,3 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 void *hash_borrar(hash_t *hash, const char *clave){
 
 }
-
-
-
-
