@@ -96,11 +96,9 @@ static bool copiar_a_posicion_hash(size_t posicion, elemento_t* elemento, const 
 static size_t encontrar_posicion(size_t a, hash_t* hash, const char* clave){
     if(hash->tabla[a].estado==VACIO || hash->tabla[a].estado==BORRADO)
         return a;
-    if(hash->tabla[a].estado==OCUPADO)
+    while(hash->tabla[a].estado==OCUPADO){
         if(strcmp(hash->tabla[a].clave, clave))
             return a;
-
-    while(hash->tabla[a].estado==OCUPADO){
         a++;
         if(a==hash->tamano_tabla)
             a=0;
@@ -138,6 +136,10 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
         if(!redimensionar_hash(hash)) return false;
 
     nro_hasheo = encontrar_posicion(nro_hasheo, hash, clave);
+    if(hash->tabla[nro_hasheo].estado==OCUPADO){
+        hash->destructor(hash->tabla[nro_hasheo].dato);
+        hash->tabla[nro_hasheo].dato = dato;
+    }
     if(!copiar_a_posicion_hash(nro_hasheo, hash, clave, dato)) return false;
     hash->cantidad_elementos_acumulados++;
     hash->cantidad_elementos_reales++;
