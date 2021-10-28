@@ -64,19 +64,21 @@ static bool redimensionar_hash(hash_t* hash){
     elemento_t* tabla_nueva= malloc(sizeof(elemento_t) * hash->tamano_tabla * CONSTANTE_REDIMENSION);
     if(tabla_nueva==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
+    size_t tamano_anterior = hash->tamano_tabla;
     hash->tamano_tabla = hash->tamano_tabla * CONSTANTE_REDIMENSION;
 
     for(size_t i=0; i<hash->tamano_tabla; i++){
-        elemento_t aux = hash->tabla[i];
-        if(aux.estado==OCUPADO){
-            size_t nro_hasheo = (size_t) jenkins_one_at_a_time_hash(aux.clave, hash->tamano_tabla);
-            
-
-
-        hash->cantidad_elementos_acumulados++;
+        elemento_t* aux = &hash->tabla[i];
+        if(aux->estado==OCUPADO){
+            size_t nro_hasheo = (size_t) jenkins_one_at_a_time_hash(aux->clave, hash->tamano_tabla);
+            hash_guardar(tabla_nueva, aux->clave, aux->dato);
+            hash->cantidad_elementos_reales++;
         }
+        hash->cantidad_elementos_acumulados++;
     }
     //hash_destruir(hash->tabla);
+    elemento_t* aux = hash->tabla;
+    tabla_destruir(aux, hash->destructor, tamano_anterior);
     hash->tabla=tabla_nueva;
     return true;
 }
@@ -147,5 +149,21 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 }
 
 void *hash_borrar(hash_t *hash, const char *clave){
+    size_t aux = encontrar_posicion((size_t) jenkins_one_at_a_time_hash(clave,hash->tamano_tabla),hash, clave);
+    void* dato = hash->tabla[aux].dato;
+    hash->destructor(hash->tabla[aux].dato);
+    hash->tabla[aux].estado = BORRADO;
+    return dato;
+}
 
+bool tabla_destruir(elemento_t* elemento, hash_destruir_dato_t destruir, size_t largo){
+    largo--;
+    while(largo >= 0){
+        if(elemento->estado==OCUPADO){
+            if(destruir != NULL){
+                destruir(elemento[largo].dato);
+            }
+        }
+    }
+    free(elemento);
 }
