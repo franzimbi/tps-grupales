@@ -23,8 +23,13 @@ struct hash{
     hash_destruir_dato_t destructor;
 };
 
+struct hash_iter{
+    size_t actual;
+    struct hash* hash;
+};
+
 //https://en.wikipedia.org/wiki/Jenkins_hash_function lo encontramos en varias paginas y la recomendan bastante
-uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t largo_hash){
+static uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t largo_hash){
     size_t i = 0;
     size_t length=strlen(key);
     uint32_t hash = 0;
@@ -107,7 +112,6 @@ static size_t encontrar_posicion(size_t a, hash_t* hash, const char* clave){
     return a;
 }
 
-
 //------------------------------------------------------ FUNCIONES DEL TDA ----------------------------------------------------------------------
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
@@ -174,8 +178,45 @@ void hash_destruir(hash_t *hash){
         if(hash->tabla[i].estado==OCUPADO){
             if(hash->destructor!=NULL)
                 hash->destructor(hash->tabla[i].dato);
+        free(hash->tabla[i].clave);
         }
     }
     free(hash->tabla);
     free(hash);
+}
+
+hash_iter_t *hash_iter_crear(const hash_t *hash){
+    hash_iter_t* iterador=malloc(sizeof(hash_iter_t));
+    if(iterador==NULL) return NULL;
+
+    iterador->hash = hash;
+
+    size_t i=0;
+    for(; i<hash->tamano_tabla; i++){
+        if(hash->tabla[i].estado==OCUPADO) break;
+    }
+    iterador->actual = i;
+    return iterador;
+}
+
+bool hash_iter_avanzar(hash_iter_t *iter){
+    if(hash_iter_al_final(iter)) return false;
+    size_t i;
+    for(i=iter->actual+1; i<iter->hash->tamano_tabla; i++){
+        if(iter->hash->tabla[i].estado==OCUPADO) break;
+    }
+    iter->actual = i;
+    return true;
+}
+
+const char *hash_iter_ver_actual(const hash_iter_t *iter){
+    return hash_iter_al_finala(iter) ? NULL : (const char*) iter->hash->tabla[iter->actual].clave;
+}
+
+bool hash_iter_al_final(const hash_iter_t *iter){
+    return iter->actual==iter->hash->tamano_tabla;
+}
+
+void hash_iter_destruir(hash_iter_t *iter){
+    free(iter);
 }
