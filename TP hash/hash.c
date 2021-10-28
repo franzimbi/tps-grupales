@@ -25,13 +25,12 @@ struct hash{
 
 struct hash_iter{
     size_t actual;
-    struct hash* hash;
+    const struct hash* hash;
 };
 
 //https://en.wikipedia.org/wiki/Jenkins_hash_function lo encontramos en varias paginas y la recomendan bastante
-static uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t largo_hash){
+static uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length){
     size_t i = 0;
-    size_t length=strlen(key);
     uint32_t hash = 0;
     while (i != length) {
         hash += key[i++];
@@ -41,49 +40,15 @@ static uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t largo_hash
     hash += hash << 3;
     hash ^= hash >> 11;
     hash += hash << 15;
-    return hash % largo_hash;
+    return hash;
 }
 
 static size_t funcion_hashing(const char* clave, size_t largo_hash){
-    return (size_t) jenkins_one_at_a_time_hash((const uint8_t*)clave, largo_hash);
-}
-
-static bool redimensionar_hash(hash_t* hash){
-    hash_t* nuevo = malloc(sizeof(hash_t));
-    if(nuevo==NULL) return false;
-
-    nuevo->cantidad_elementos_acumulados=0;
-    nuevo->cantidad_elementos_reales = 0;
-    nuevo->tamano_tabla = hash->tamano_tabla * CONSTANTE_REDIMENSION;
-    nuevo->destructor = hash->destructor;
-
-    nuevo->tabla = malloc(sizeof(elemento_t) * nuevo->tamano_tabla);
-    if(nuevo->tabla==false){
-        free(nuevo);
-        return false;
-    }
-    for(size_t i=0; i<nuevo->tamano_tabla; i++)
-            nuevo->tabla[i].estado==VACIO;
-    for(size_t i=0; i<hash->tamano_tabla; i++){
-        if(hash->tabla[i].estado==OCUPADO){
-            size_t nro_hasheo = funcion_hashing(hash->tabla[i].clave, hash->tamano_tabla);
-            nro_hasheo = encontrar_posicion(nro_hasheo, nuevo, hash->tabla[i].clave);
-            if(!copiar_a_posicion_hash(nro_hasheo, nuevo, hash->tabla[i].clave, hash->tabla[i].dato)){
-                hash_destruir(nuevo);
-                return false;
-            }
-        }
-        if(nuevo->cantidad_elementos_reales==hash->cantidad_elementos_reales)
-            break;
-    }
-    hash->destructor = NULL;
-    hash_destruir(hash);
-    hash = nuevo;
-    return true;
+    return (size_t) jenkins_one_at_a_time_hash((const uint8_t*)clave, strlen(clave)) % largo_hash;
 }
 
 //copia a posicion el nuevo dato o lo reemplaza
-static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, char* clave, void* dato){
+static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* clave, void* dato){
     if(hash->tabla[posicion].estado==OCUPADO){
         hash->destructor(hash->tabla[posicion].dato);
         hash->tabla[posicion].dato = dato;
@@ -112,6 +77,39 @@ static size_t encontrar_posicion(size_t a, hash_t* hash, const char* clave){
     return a;
 }
 
+static bool redimensionar_hash(hash_t* hash){
+    hash_t* nuevo = malloc(sizeof(hash_t));
+    if(nuevo==NULL) return false;
+
+    nuevo->cantidad_elementos_acumulados=0;
+    nuevo->cantidad_elementos_reales = 0;
+    nuevo->tamano_tabla = hash->tamano_tabla * CONSTANTE_REDIMENSION;
+    nuevo->destructor = hash->destructor;
+
+    nuevo->tabla = malloc(sizeof(elemento_t) * nuevo->tamano_tabla);
+    if(nuevo->tabla==false){
+        free(nuevo);
+        return false;
+    }
+    for(size_t i=0; i<nuevo->tamano_tabla; i++)
+            nuevo->tabla[i].estado=VACIO;
+    for(size_t i=0; i<hash->tamano_tabla; i++){
+        if(hash->tabla[i].estado==OCUPADO){
+            size_t nro_hasheo = funcion_hashing(hash->tabla[i].clave, hash->tamano_tabla);
+            nro_hasheo = encontrar_posicion(nro_hasheo, nuevo, hash->tabla[i].clave);
+            if(!copiar_a_posicion_hash(nro_hasheo, nuevo, hash->tabla[i].clave, hash->tabla[i].dato)){
+                hash_destruir(nuevo);
+                return false;
+            }
+        }
+        if(nuevo->cantidad_elementos_reales==hash->cantidad_elementos_reales)
+            break;
+    }
+    hash->destructor = NULL;
+    hash_destruir(hash);
+    hash = nuevo;
+    return true;
+}
 //------------------------------------------------------ FUNCIONES DEL TDA ----------------------------------------------------------------------
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
@@ -136,7 +134,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    if(((hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
+    if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
         if(!redimensionar_hash(hash)) return false;
 
     nro_hasheo = encontrar_posicion(nro_hasheo, hash, clave);
@@ -210,7 +208,7 @@ bool hash_iter_avanzar(hash_iter_t *iter){
 }
 
 const char *hash_iter_ver_actual(const hash_iter_t *iter){
-    return hash_iter_al_finala(iter) ? NULL : (const char*) iter->hash->tabla[iter->actual].clave;
+    return hash_iter_al_final(iter) ? NULL : (const char*) iter->hash->tabla[iter->actual].clave;
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
