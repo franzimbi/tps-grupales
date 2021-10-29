@@ -428,8 +428,3 @@ void pruebas_volumen_catedra(size_t largo)
 {
     prueba_hash_volumen(largo, false);
 }
-
-int main(void){
-    pruebas_hash_catedra();
-    return 0;
-}

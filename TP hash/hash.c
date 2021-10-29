@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#define CANTIDAD_INICIAL 5000
+#define CANTIDAD_INICIAL 1000
 #define CONSTANTE_AUMENTO_DE_TABLA 10 //aumenta cte veces
 #define CONSTANTE_DISMINUCION_DE_TABLA 2 //se achica a 1/cte
 
@@ -74,11 +74,11 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
     while(tabla[a].estado==OCUPADO || tabla[a].estado==BORRADO){
        // if(tabla[a].estado==BORRADO) continue;
-       if(tabla[a].estado==OCUPADO){
+    if(tabla[a].estado==OCUPADO){
         if(strcmp(tabla[a].clave, clave)==0)
             return a;
-       } 
-       
+    } 
+
         a++;
         if(a==tamano_tabla)
             a=0;
@@ -140,7 +140,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 }
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
-    if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
+    if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > (float)0.7)
         if(!redimensionar_hash(hash, AGRANDAR)) return false;
 
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
@@ -183,7 +183,6 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 size_t hash_cantidad(const hash_t *hash){
-    fprintf(stderr, "\nCANTIDAD: %zu\n", hash->cantidad_elementos_reales);
     return hash->cantidad_elementos_reales;
 }
 
