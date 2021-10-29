@@ -93,6 +93,7 @@ static bool redimensionar_hash(hash_t* hash, redimension_t cte_redim){
     elemento_t* nueva_tabla = malloc(sizeof(elemento_t)* tamano_nuevo);
     if(nueva_tabla==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
+    hash->cantidad_elementos_reales = 0;
     for(size_t i=0; i<(tamano_nuevo); i++){
         nueva_tabla[i].estado=VACIO;
     }
@@ -104,6 +105,7 @@ static bool redimensionar_hash(hash_t* hash, redimension_t cte_redim){
             nueva_tabla[nro_hasheo].clave = hash->tabla[i].clave;
             nueva_tabla[nro_hasheo].dato = hash->tabla[i].dato;
             hash->cantidad_elementos_acumulados++;
+            hash->cantidad_elementos_reales ++;
         }
     }
     hash->tamano_tabla = tamano_nuevo;
@@ -177,6 +179,7 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 size_t hash_cantidad(const hash_t *hash){
+    fprintf(stderr, "\nCANTIDAD: %zu\n", hash->cantidad_elementos_reales);
     return hash->cantidad_elementos_reales;
 }
 
