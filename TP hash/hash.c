@@ -155,11 +155,13 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void *hash_obtener(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
+    nro_hasheo = encontrar_posicion(nro_hasheo,hash->tabla,hash->tamano_tabla,clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO ? hash->tabla[nro_hasheo].dato : NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
+    nro_hasheo = encontrar_posicion(nro_hasheo,hash->tabla,hash->tamano_tabla,clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO;
 }
 
