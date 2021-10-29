@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 #define CANTIDAD_INICIAL 500
 #define CONSTANTE_AUMENTO_DE_TABLA 10 //aumenta cte veces
 #define CONSTANTE_DISMINUCION_DE_TABLA 2 //se achica a 1/cte
@@ -81,12 +82,14 @@ static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabl
     return a;
 }
 
+
 static bool redimensionar_hash(hash_t* hash, redimension_t cte_redim){
     size_t tamano_nuevo;
     if(cte_redim==AGRANDAR)
         tamano_nuevo = hash->tamano_tabla * CONSTANTE_AUMENTO_DE_TABLA;
     else
         tamano_nuevo = hash->tamano_tabla / CONSTANTE_DISMINUCION_DE_TABLA;
+
     elemento_t* nueva_tabla = malloc(sizeof(elemento_t)* tamano_nuevo);
     if(nueva_tabla==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
@@ -135,7 +138,6 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
         if(!redimensionar_hash(hash, AGRANDAR)) return false;
 
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-
     nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
     if(hash->tabla[nro_hasheo].estado==OCUPADO){
         if(hash->destructor!=NULL)
