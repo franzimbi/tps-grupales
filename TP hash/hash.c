@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-
-#define CANTIDAD_INICIAL 1000
+#define CANTIDAD_INICIAL 5000000
 #define CONSTANTE_REDIMENSION 10
 
 typedef enum {VACIO, OCUPADO, BORRADO} estado_t;
@@ -70,25 +69,17 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 
 //a es el nro devulto por la funcion de hashing
 static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
-    size_t counter = 0;
-
     while(tabla[a].estado==OCUPADO){
-        //if(counter >=1)
-        //fprintf(stderr, "%ld ACA\n\n", counter);
-        
-        if(!strcmp(tabla[a].clave, clave))
+        if(strcmp(tabla[a].clave, clave)==0)
             return a;
         a++;
         if(a==tamano_tabla)
             a=0;
-
-        counter++;
     }
-
     return a;
 }
 
-static bool redimensionar_hash(hash_t* hash){
+static bool redimensionar_hash(hash_t* hash, elemento_t* tabla){
     elemento_t* nueva_tabla = malloc(sizeof(elemento_t)* hash->tamano_tabla * CONSTANTE_REDIMENSION);
     if(nueva_tabla==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
@@ -134,7 +125,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
-        if(!redimensionar_hash(hash)) return false;
+        if(!redimensionar_hash(hash, hash->tabla)) return false;
 
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
 
@@ -164,13 +155,11 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void *hash_obtener(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO ? hash->tabla[nro_hasheo].dato : NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO;
 }
 

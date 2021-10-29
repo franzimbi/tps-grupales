@@ -419,9 +419,9 @@ void pruebas_hash_catedra()
     prueba_hash_borrar();
     prueba_hash_clave_vacia();
     prueba_hash_valor_null();
-    prueba_hash_volumen(1500, true);
+    prueba_hash_volumen(5000, true);
     prueba_hash_iterar();
-    prueba_hash_iterar_volumen(1500);
+    prueba_hash_iterar_volumen(5000);
 }
 
 void pruebas_volumen_catedra(size_t largo)
@@ -430,12 +430,6 @@ void pruebas_volumen_catedra(size_t largo)
 }
 
 int main(void){
-<<<<<<< HEAD
     pruebas_hash_catedra();
-    //pruebas_volumen_catedra(10);
-
-=======
-    pruebas_hash_catedra(); 
->>>>>>> 0bd41c676643371c83fe0e060e60b72e44598e27
     return 0;
 }
