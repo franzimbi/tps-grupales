@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 #define CANTIDAD_INICIAL 1000
 #define CONSTANTE_REDIMENSION 10
 
@@ -87,7 +88,7 @@ static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabl
     return a;
 }
 
-static bool redimensionar_hash(hash_t* hash, elemento_t* tabla){
+static bool redimensionar_hash(hash_t* hash){
     elemento_t* nueva_tabla = malloc(sizeof(elemento_t)* hash->tamano_tabla * CONSTANTE_REDIMENSION);
     if(nueva_tabla==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
@@ -133,7 +134,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > 0.7)
-        if(!redimensionar_hash(hash, hash->tabla)) return false;
+        if(!redimensionar_hash(hash)) return false;
 
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
 

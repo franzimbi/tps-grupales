@@ -430,8 +430,12 @@ void pruebas_volumen_catedra(size_t largo)
 }
 
 int main(void){
+<<<<<<< HEAD
     pruebas_hash_catedra();
     //pruebas_volumen_catedra(10);
 
+=======
+    pruebas_hash_catedra(); 
+>>>>>>> 0bd41c676643371c83fe0e060e60b72e44598e27
     return 0;
 }
