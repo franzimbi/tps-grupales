@@ -74,8 +74,11 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
     while(tabla[a].estado==OCUPADO || tabla[a].estado==BORRADO){
        // if(tabla[a].estado==BORRADO) continue;
+       if(tabla[a].estado==OCUPADO){
         if(strcmp(tabla[a].clave, clave)==0)
             return a;
+       } 
+       
         a++;
         if(a==tamano_tabla)
             a=0;
