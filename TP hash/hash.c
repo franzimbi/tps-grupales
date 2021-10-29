@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#define CANTIDAD_INICIAL 500
+#define CANTIDAD_INICIAL 5000
 #define CONSTANTE_AUMENTO_DE_TABLA 10 //aumenta cte veces
 #define CONSTANTE_DISMINUCION_DE_TABLA 2 //se achica a 1/cte
 
@@ -72,7 +72,8 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 
 //a es el nro devulto por la funcion de hashing
 static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
-    while(tabla[a].estado==OCUPADO){
+    while(tabla[a].estado==OCUPADO || tabla[a].estado==BORRADO){
+       // if(tabla[a].estado==BORRADO) continue;
         if(strcmp(tabla[a].clave, clave)==0)
             return a;
         a++;
