@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define CANTIDAD_INICIAL 10000
+#define CANTIDAD_INICIAL 10000000
 #define CONSTANTE_REDIMENSION 10
 
 typedef enum {VACIO, OCUPADO, BORRADO} estado_t;
@@ -157,6 +157,7 @@ void *hash_borrar(hash_t *hash, const char *clave){
     if(hash->tabla[nro_hasheo].estado==OCUPADO){
         void* dato = hash->tabla[nro_hasheo].dato;
         hash->tabla[nro_hasheo].estado=BORRADO;
+        free(hash->tabla[nro_hasheo].clave);
         hash->cantidad_elementos_reales --;
         return dato;
     }
