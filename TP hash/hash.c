@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define CANTIDAD_INICIAL 5000000
+#define CANTIDAD_INICIAL 1000
 #define CONSTANTE_REDIMENSION 10
 
 typedef enum {VACIO, OCUPADO, BORRADO} estado_t;
@@ -69,13 +69,21 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 
 //a es el nro devulto por la funcion de hashing
 static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
+    size_t counter = 0;
+
     while(tabla[a].estado==OCUPADO){
-        if(strcmp(tabla[a].clave, clave)==0)
+        //if(counter >=1)
+        //fprintf(stderr, "%ld ACA\n\n", counter);
+        
+        if(!strcmp(tabla[a].clave, clave))
             return a;
         a++;
         if(a==tamano_tabla)
             a=0;
+
+        counter++;
     }
+
     return a;
 }
 
@@ -155,11 +163,13 @@ void *hash_borrar(hash_t *hash, const char *clave){
 
 void *hash_obtener(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
+    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO ? hash->tabla[nro_hasheo].dato : NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
     size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
+    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO;
 }
 
