@@ -131,12 +131,13 @@ static void prueba_lista_iterador_interno(){
     int resultado_real = 0;
     int resultado_iterado=0;
     int posicion_ultimo_cero = 0;
+    bool ok = true;
     for(int i=0; i<CANTIDAD_DATOS;i++){
         datos[i]=i;
-        print_test("crear un dato", datos[i]==i);
-        print_test("insertar el dato", lista_insertar_ultimo(lista, &datos[i]));
+        ok &=lista_insertar_ultimo(lista, &datos[i]);
         resultado_real+=datos[i];
     }
+    print_test("insertar varios datos", ok);
 
     lista_iterar(lista,(bool (*)(void *, void *)) sumar_lista, &resultado_iterado);
     print_test("sumar datos con iterador interno", resultado_iterado==resultado_real);
@@ -173,13 +174,14 @@ static void prueba_lista_iterador_externo_loop(){
     lista_iter_t* iterador=lista_iter_crear(lista);
     print_test("crear iterador de la lista", iterador!=NULL);
 
-    printf("loopeando iterador hasta el final:\n");
+    bool ok = true;
     int i=0;
     while(!lista_iter_al_final(iterador)){
-        print_test("vericar que el primer dato", lista_iter_ver_actual(iterador)==&datos[i]);
-        print_test("avanzar iterador", lista_iter_avanzar(iterador));
+        ok &= lista_iter_ver_actual(iterador)==&datos[i];
+        ok &= lista_iter_avanzar(iterador);
         i++;
     }
+    print_test("loopeando iterador hasta el final", ok);
     printf("loop terminado\n");
     print_test("verificar que iterador esta al final", lista_iter_al_final(iterador)==true);
     print_test("verificar que no avanza mas", !lista_iter_avanzar(iterador));
@@ -212,21 +214,24 @@ static void prueba_lista_iterador_externo_insertar_borrar(){
     }
     print_test("crear listas para insertar", true);
 
+    bool ok = true;
     for(int i=0; i<CANTIDAD_DATOS;i++){
-        print_test("insertar dato", lista_iter_insertar(iterador, datos[i]));
-        print_test("verificar que actual sea el dato insertado", lista_iter_ver_actual(iterador)==datos[i]);
+        ok &= lista_iter_insertar(iterador, datos[i]);
+        ok &= lista_iter_ver_actual(iterador)==datos[i];
     }
-
+    print_test("insertar varios datos", ok);
     print_test("destruir iterador", lista!=NULL);
     lista_iter_destruir(iterador);
     iterador=lista_iter_crear(lista);
     print_test("crear nuevo iterador de la lista", iterador!=NULL);
 
+    ok=true;
     for(int i=0; i<CANTIDAD_DATOS;i++){
-        print_test("verificar actual del iterador sea el primero de la lista", lista_iter_ver_actual(iterador)==lista_ver_primero(lista));
+        ok &= lista_iter_ver_actual(iterador)==lista_ver_primero(lista);
         lista_t* aux = lista_iter_ver_actual(iterador);
-        print_test("borrar actual con el iterador", lista_iter_borrar(iterador)==aux);
+        ok &= lista_iter_borrar(iterador)==aux;
     }
+    print_test("borrar datos", ok);
     print_test("verificar que iterador esta al final", lista_iter_al_final(iterador));
 
     print_test("volver a insertar datos", true);
@@ -320,19 +325,22 @@ static void pruebas_de_cantidad_lista_e_iterar(){
     lista_t* lista = lista_crear();
     print_test("crear lista", lista!=NULL);
 
+    bool ok = true;
     for(size_t i = 0; i < CANTIDAD_DATOS ; i++){
-        print_test("insertar primero", lista_insertar_primero(lista, array[i]));
+        ok &=lista_insertar_primero(lista, array[i]);
     }
-
+    print_test("insertar primero varias veces", ok); 
 
     lista_iter_t* iter = lista_iter_crear(lista);
     print_test("crear iterador de la lista", iter!=NULL);
 
+    ok = true;
     printf("Iterando elementos:\n");
     while (!lista_iter_al_final(iter)){
         
-        print_test("iter avanzar", lista_iter_avanzar(iter));
+        lista_iter_avanzar(iter);
     }
+    print_test("iter avanzar hasta el final", ok);
 
     print_test("destuir iterador de la lista", true);
     lista_iter_destruir(iter);
