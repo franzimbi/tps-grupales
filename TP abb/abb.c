@@ -27,8 +27,19 @@ static abb_nodo_t* nodo_crear(char* clave, void* dato){
     }
     strcpy(nuevo->clave, clave);
     nuevo->dato = dato;
-
 }
+static void* nodo_destruir(abb_nodo_t* nodo){
+    free(nodo->clave);
+    void* aux = nodo->dato;
+    free(nodo);
+    nodo=NULL;
+    return aux;
+}
+
+static abb_nodo_t* nodo_reemplazo(abb_nodo_t* raiz){
+    if(raiz->der==NULL && )
+}
+
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     abb_t* nuevo=malloc(sizeof(abb_t));
     if(nuevo==NULL) return NULL;
@@ -121,6 +132,31 @@ void abb_destruir(abb_t *arbol){
     return abb_destruir_(arbol->raiz, arbol);
 }
 
-void* abb_borrar(abb_t *arbol, const char *clave){
-    
+static void* abb_borrar_(abb_nodo_t *raiz, const char *clave, abb_t* arbol){
+    if(raiz==NULL)
+        return NULL;
+
+    if(arbol->cmp(clave, raiz->clave)){
+        /*if(raiz->izq==NULL && raiz->der==NULL)
+            return nodo_destruir(raiz); */
+        if(raiz->izq==NULL){
+            abb_nodo_t* reemplazo = raiz->der;
+            void* dato = nodo_destruir(raiz);
+            raiz = reemplazo;
+            return dato;
+        }
+        if(raiz->der==NULL){
+            abb_nodo_t* reemplazo = raiz->izq;
+            void* dato = nodo_destruir(raiz);
+            raiz = reemplazo;
+            return dato;
+        }else{
+            abb_nodo_t* reemplazante = nodo_reemplazo(raiz);
+        }
+    }
+    if(arbol->cmp(clave, raiz->clave)<0){
+        return abb_borrar_(raiz->izq, clave, arbol);
+    }else{
+        return abb_borrar_(raiz->der, clave, arbol);
+    }
 }
