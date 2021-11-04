@@ -26,7 +26,7 @@ static abb_nodo_t* nodo_crear(char* clave, void* dato){
     if(nuevo==NULL) return NULL;
     nuevo->izq=NULL;
     nuevo->der=NULL;
-    nuevo->clave=malloc(sizeof(char)*strlen(clave));
+    nuevo->clave=malloc(sizeof(char)*(strlen(clave)+1));
     if(nuevo->clave==NULL){
         free(nuevo);
         return NULL;
