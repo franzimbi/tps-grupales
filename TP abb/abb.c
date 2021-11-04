@@ -33,6 +33,7 @@ static abb_nodo_t* nodo_crear(char* clave, void* dato){
     }
     strcpy(nuevo->clave, clave);
     nuevo->dato = dato;
+    return nuevo;
 }
 static void* nodo_destruir(abb_nodo_t* nodo){
     free(nodo->clave);
@@ -65,7 +66,7 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 
 static bool abb_guardar_(abb_nodo_t* raiz, const char *clave, void *dato, abb_t* arbol){
     if(raiz==NULL){
-        raiz = nodo_crear(clave, dato);
+        raiz = nodo_crear((char*)clave, dato);
         if(raiz==NULL) return false;
         return true;
     }
@@ -86,7 +87,7 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
     return abb_guardar_(arbol->raiz, clave, dato, arbol);
 }
 
-static void *abb_obtener_(const abb_nodo_t *raiz, const char *clave, abb_t* arbol){
+static void *abb_obtener_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
     if(raiz==NULL)
         return NULL;
     if(arbol->cmp(clave, raiz->clave))
@@ -102,7 +103,7 @@ void* abb_obtener(const abb_t *arbol, const char *clave){
     return abb_obtener_(arbol->raiz, clave, arbol);
 }
 
-static bool abb_pertenece_(const abb_nodo_t *raiz, const char *clave, abb_t* arbol){
+static bool abb_pertenece_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
     if(raiz==NULL)
         return false;
     if(arbol->cmp(clave, raiz->clave))
@@ -130,17 +131,15 @@ size_t abb_cantidad(const abb_t *arbol){
     return abb_cantidad_(arbol->raiz);
 }
 
-static abb_destruir_(abb_nodo_t* raiz, abb_t* arbol){
+static void abb_destruir_(abb_nodo_t* raiz, abb_t* arbol){
     if(raiz==NULL)
         return;
-    if(raiz!=NULL){
-        abb_destruir_(raiz->izq, arbol);
-        abb_destruir_(raiz->der, arbol);
-        void* dato = nodo_destruir(raiz);
-        if(arbol->destruir_dato!=NULL);
-            arbol->destruir_dato(dato);
-        raiz=NULL;
-    }
+    abb_destruir_(raiz->izq, arbol);
+    abb_destruir_(raiz->der, arbol);
+    void* dato = nodo_destruir(raiz);
+    if(arbol->destruir_dato!=NULL)
+        arbol->destruir_dato(dato);
+    raiz=NULL;
 }
 
 void abb_destruir(abb_t *arbol){
@@ -192,9 +191,9 @@ static void abb_in_order_(abb_nodo_t *raiz, bool visitar(const char *, void *, v
     if(raiz==NULL)
         return;
 
-        abb_in_order_(raiz->izq, visitar, extra);
-        if(!visitar(raiz->clave, raiz->dato, extra)) return;
-        abb_in_order_(raiz->der, visitar, extra);
+    abb_in_order_(raiz->izq, visitar, extra);
+    if(!visitar(raiz->clave, raiz->dato, extra)) return;
+    abb_in_order_(raiz->der, visitar, extra);
 }
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
     return abb_in_order_(arbol->raiz, visitar, extra);
