@@ -131,6 +131,8 @@ size_t abb_cantidad(const abb_t *arbol){
 }
 
 static abb_destruir_(abb_nodo_t* raiz, abb_t* arbol){
+    if(raiz==NULL)
+        return;
     if(raiz!=NULL){
         abb_destruir_(raiz->izq, arbol);
         abb_destruir_(raiz->der, arbol);
@@ -142,7 +144,8 @@ static abb_destruir_(abb_nodo_t* raiz, abb_t* arbol){
 }
 
 void abb_destruir(abb_t *arbol){
-    return abb_destruir_(arbol->raiz, arbol);
+    abb_destruir_(arbol->raiz, arbol);
+    free(arbol);
 }
 
 static void* abb_borrar_(abb_nodo_t *raiz, const char *clave, abb_t* arbol){
