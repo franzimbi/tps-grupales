@@ -25,6 +25,8 @@ void abb_destruir(abb_t *arbol);
 
 //<----------------------- ITERADORES ------------->//
 
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra);
+
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol);
 
 bool abb_iter_in_avanzar(abb_iter_t *iter);

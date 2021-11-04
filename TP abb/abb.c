@@ -1,4 +1,5 @@
 #include "abb.h"
+#include "pila.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,6 +14,11 @@ struct abb{
     struct abb_nodo* raiz;
     abb_comparar_clave_t cmp;
     abb_destruir_dato_t destruir_dato;
+};
+
+struct abb_iter{
+    pila_t* pila;
+    abb_nodo_t* raiz;
 };
 
 static abb_nodo_t* nodo_crear(char* clave, void* dato){
@@ -36,8 +42,15 @@ static void* nodo_destruir(abb_nodo_t* nodo){
     return aux;
 }
 
-static abb_nodo_t* nodo_reemplazo(abb_nodo_t* raiz){
-    if(raiz->der==NULL && )
+static abb_nodo_t* nodo_todo_der(abb_nodo_t* raiz){
+    if(raiz->der==NULL){
+        abb_nodo_t* aux = raiz;
+        if(raiz->izq!=NULL)
+            raiz = raiz->izq;
+        else raiz = NULL;
+        return aux;
+    }
+    return nodo_todo_der(raiz->der);
 }
 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
@@ -121,9 +134,9 @@ static abb_destruir_(abb_nodo_t* raiz, abb_t* arbol){
     if(raiz!=NULL){
         abb_destruir_(raiz->izq, arbol);
         abb_destruir_(raiz->der, arbol);
+        void* dato = nodo_destruir(raiz);
         if(arbol->destruir_dato!=NULL);
-            arbol->destruir_dato(raiz->dato);
-        free(raiz);
+            arbol->destruir_dato(dato);
         raiz=NULL;
     }
 }
@@ -151,7 +164,13 @@ static void* abb_borrar_(abb_nodo_t *raiz, const char *clave, abb_t* arbol){
             raiz = reemplazo;
             return dato;
         }else{
-            abb_nodo_t* reemplazante = nodo_reemplazo(raiz);
+            abb_nodo_t* reemplazante = nodo_todo_der(raiz->izq);
+            abb_nodo_t* izq = raiz->izq;
+            abb_nodo_t* der = raiz->der;
+            void* dato = nodo_destruir(raiz);
+            reemplazante->izq = izq;
+            reemplazante->der = der;
+            return dato;
         }
     }
     if(arbol->cmp(clave, raiz->clave)<0){
@@ -159,4 +178,65 @@ static void* abb_borrar_(abb_nodo_t *raiz, const char *clave, abb_t* arbol){
     }else{
         return abb_borrar_(raiz->der, clave, arbol);
     }
+}
+
+void* abb_borrar(abb_t *arbol, const char *clave){
+    return abb_borrar_(arbol->raiz, clave, arbol);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - ITERADORES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+static void abb_in_order_(abb_nodo_t *raiz, bool visitar(const char *, void *, void *), void *extra){
+    if(raiz==NULL)
+        return;
+
+        abb_in_order_(raiz->izq, visitar, extra);
+        if(!visitar(raiz->clave, raiz->dato, extra)) return;
+        abb_in_order_(raiz->der, visitar, extra);
+}
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
+    return abb_in_order_(arbol->raiz, visitar, extra);
+}
+
+abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
+    abb_iter_t* iter = malloc(sizeof(abb_iter_t));
+    if(iter==NULL)
+        return NULL;
+    
+    iter->pila = pila_crear();
+    if(iter->pila==NULL){
+        free(iter);
+        return NULL;
+    }
+    abb_nodo_t* raiz = arbol->raiz;
+    iter->raiz = raiz;
+
+    while(raiz!=NULL){
+        pila_apilar(iter->pila, raiz);
+        raiz = raiz->izq;
+    }
+    return iter;
+}
+const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
+    abb_nodo_t* aux = pila_ver_tope(iter->pila);
+    return aux!=NULL ? aux->clave : NULL;
+}
+bool abb_iter_in_al_final(const abb_iter_t *iter){
+    return pila_esta_vacia(iter->pila);
+}
+
+void abb_iter_in_destruir(abb_iter_t* iter){
+    pila_destruir(iter->pila);
+}
+
+bool abb_iter_in_avanzar(abb_iter_t *iter){
+    if(abb_iter_in_al_final(iter)) return false;
+    abb_nodo_t* aux = pila_desapilar(iter->pila);
+    if(aux->der!=NULL){
+        aux = aux->der;
+        while(aux!=NULL){
+            pila_apilar(iter->pila, aux);
+            aux = aux->izq;
+        }
+    }
+    return true;
 }
