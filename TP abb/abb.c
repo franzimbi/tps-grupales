@@ -12,7 +12,7 @@ typedef struct abb_nodo{
 }abb_nodo_t;
 
 struct abb{
-    abb_nodo_t* raiz;
+    struct abb_nodo* raiz;
     abb_comparar_clave_t cmp;
     abb_destruir_dato_t destruir_dato;
 };
@@ -33,7 +33,6 @@ static abb_nodo_t* nodo_crear(char* clave, void* dato){
         return NULL;
     }
     strcpy(nuevo->clave, clave);
-    fprintf(stderr,"%s\n\n", (char*) nuevo->clave);
     nuevo->dato = dato;
     return nuevo;
 }
@@ -66,71 +65,47 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     return nuevo;
 }
 
-static bool abb_guardar_(abb_nodo_t* raiz, const char *clave, void *dato, abb_t* arbol){
-    fprintf(stderr, "esto es raiz: %p\nesto es arbol raiz: %p\n", raiz, arbol->raiz);
-    fprintf(stderr, "esto es raiz: %p\nesto es arbol raiz: %p\n", &raiz, &arbol->raiz);
-    
-
-    if(raiz==NULL){
-        fprintf(stderr,"RAIZ NULA\n\n");
-        raiz = nodo_crear((char*)clave, dato);
-        //fprintf(stderr,"%s\n\n %s\n\n", (char*) raiz->clave, (char*) raiz->dato);
-        //fprintf(stderr,"esto es izq %p\n y esto der %p\n", raiz->izq, raiz->der);
-        arbol->raiz = raiz;
-        if(raiz==NULL){
-          fprintf(stderr,"NO SE ASIGNÓ\n\n");
-          return false;  
-        } 
-
-        fprintf(stderr, "esto es raiz: %p\nesto es arbol raiz: %p\n", raiz, arbol->raiz);
+static bool abb_guardar_(abb_nodo_t** raiz, const char *clave, void *dato, abb_t* arbol){
+    if(*raiz==NULL){
+        *raiz = nodo_crear((char*)clave, dato);
+        if((*raiz)==NULL) return false;
         return true;
     }
-    if(arbol->cmp(clave, raiz->clave)){
+
+    if(arbol->cmp(clave, (*raiz)->clave) == 0){
         if(arbol->destruir_dato!= NULL)
-            arbol->destruir_dato(raiz->dato);
-        raiz->dato=dato;
+            arbol->destruir_dato((*raiz)->dato);
+        (*raiz)->dato=dato;
     }
-    if(arbol->cmp(clave, raiz->clave)<0){
-        return abb_guardar_(raiz->izq, clave, dato, arbol);
+    
+    //fprintf(stderr,"seguro la palma aca\n");
+    abb_nodo_t** aux = &(*raiz);
+    if(arbol->cmp(clave, (*raiz)->clave)<0){
+        return abb_guardar_(&(*aux)->izq, clave, dato, arbol);
     }else{
-        return abb_guardar_(raiz->der, clave, dato, arbol);
+        return abb_guardar_(&(*aux)->der, clave, dato, arbol);
     }
     
 }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
-    return abb_guardar_(arbol->raiz, clave, dato, arbol);
+    abb_nodo_t** aux = &(arbol)->raiz;
+    return abb_guardar_(aux, clave, dato, arbol);
 }
 
 static void *abb_obtener_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
-        fprintf(stderr, "esto es la raiz %s\n",(char*) raiz->clave);
-    fprintf(stderr, "esto es la raiz %s\n",(char*) raiz->dato);
-           
-
-    if(raiz==NULL){
-    //fprintf(stderr,"RAIZ NULA OBTENER\n\n");
-        return NULL; 
-    }
-    if(arbol->cmp(clave, raiz->clave) == 0){
-        //fprintf(stderr,"entra aca aen cmp\n\n");
+    if(raiz==NULL)
+        return NULL;
+    if(arbol->cmp(clave, raiz->clave) == 0)
         return raiz->dato;
-    }
-    
-    //fprintf(stderr,"entra aca aen cmp\n\n");
-
     if(arbol->cmp(clave, raiz->clave)<0){
-                fprintf(stderr,"entra aca aen cmp 1\n\n");
-
         return abb_obtener_(raiz->izq, clave, arbol);
     }else{
-                fprintf(stderr,"entra aca aen cmp 2\n\n");
-
         return abb_obtener_(raiz->der, clave, arbol);
     }
 }
 
 void* abb_obtener(const abb_t *arbol, const char *clave){
-    fprintf(stderr, "esto es raiz vacia? %d\n\n", arbol->raiz == NULL);
     return abb_obtener_(arbol->raiz, clave, arbol);
 }
 
@@ -159,6 +134,10 @@ static size_t abb_cantidad_(const abb_nodo_t* raiz){
 }
 
 size_t abb_cantidad(const abb_t *arbol){
+    if(arbol->raiz == NULL){
+        return 0;
+    }
+    //fprintf(stderr,"aca seguro\n");
     return abb_cantidad_(arbol->raiz);
 }
 
@@ -183,17 +162,14 @@ static void* abb_borrar_(abb_nodo_t *raiz, const char *clave, abb_t* arbol){
         return NULL;
 
     if(arbol->cmp(clave, raiz->clave) == 0){
-        /*if(raiz->izq==NULL && raiz->der==NULL)
-            return nodo_destruir(raiz); */
         if(raiz->izq==NULL && raiz->der==NULL){
-            abb_nodo_t* reemplazo = raiz;
-            fprintf(stderr,"entra aca aen cmp lol\n\n");
-            void* dato = nodo_destruir(reemplazo);
+            void* aux = nodo_destruir(raiz); 
             raiz = NULL;
-            return dato;
+            fprintf(stderr," el arbol tiene algo?: %p\n %p\n", arbol->raiz , raiz);
+            return aux;
         }
         if(raiz->izq==NULL){
-            abb_nodo_t* reemplazo = NULL;
+            abb_nodo_t* reemplazo = raiz->der;
             void* dato = nodo_destruir(raiz);
             raiz = reemplazo;
             return dato;
