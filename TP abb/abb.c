@@ -149,11 +149,8 @@ void abb_destruir(abb_t *arbol){
 }
 
 static abb_nodo_t** nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
-    fprintf(stderr,"Raiz dato apenas entra:\n%s\n", (char*)(*raiz)->dato);
-    if((*raiz)->der==NULL){    
-        fprintf(stderr,"Raiz dato con der != NULL:\n%s\n", (char*)(*raiz)->dato);    
+    if((*raiz)->der==NULL){       
         abb_nodo_t** aux = &(*raiz);
-        fprintf(stderr,"Aux pasa bien la ref\n %s\n", (char*)(*aux)->dato);
         if((*raiz)->izq!=NULL)
             (*padre)->der = (*raiz)->izq;
         
@@ -164,7 +161,6 @@ static abb_nodo_t** nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
         else (*padre)->der = NULL;
         return aux;
     }
-    fprintf(stderr, "NO DEBERIA\n");
     *padre = *raiz;
     return nodo_todo_der(&(*raiz)->der, &(*padre));
 }
@@ -174,42 +170,27 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
         return NULL;
 
     if(arbol->cmp(clave, (*raiz)->clave) == 0){
+        //fprintf(stderr, "aca\n");
         if((*raiz)->izq==NULL && (*raiz)->der==NULL){
             void* aux = nodo_destruir(*raiz); 
             *raiz = NULL;
-            fprintf(stderr," el arbol tiene algo?: %p\n %p\n", arbol->raiz , raiz);
             return aux;
         }
         if((*raiz)->izq==NULL){
-            fprintf(stderr, "ENTRO EN IZQ NULL\n");
-            abb_nodo_t** reemplazo = &(*raiz)->der;
+            abb_nodo_t* reemplazo = (*raiz)->der;
             void* dato = nodo_destruir(*raiz);
-            *raiz = *reemplazo;
+            *raiz = reemplazo;
             return dato;
         }
         if((*raiz)->der==NULL){
-            abb_nodo_t** reemplazo = &(*raiz)->izq;
+            abb_nodo_t* reemplazo = (*raiz)->izq;
             void* dato = nodo_destruir(*raiz);
-            *raiz = *reemplazo;
+            *raiz = reemplazo;
             return dato;
         }else{
-            abb_nodo_t** reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));
-            fprintf(stderr,"reemplazo-dato\n %s\n", (char*)(*reemplazo_de_borrado)->dato);            
+            abb_nodo_t** reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));           
             abb_nodo_t** izq = &(*raiz)->izq;
-            fprintf(stderr,"izq-dato\n %s\n", (char*)(*izq)->dato);
-            fprintf(stderr,"reemplazo-dato\n %s\n", (char*)(*reemplazo_de_borrado)->dato);
-            fprintf(stderr,"raiz der dato despues de nodo_todo_der \n %s\n", (char*)(*raiz)->der->dato);
-            fprintf(stderr,"reemplazo-dato\n %s\n", (char*)(*reemplazo_de_borrado)->dato);
             abb_nodo_t** der = &(*raiz)->der;
-            fprintf(stderr,"der-dato\n %s\n", (char*)(*der)->dato);
-            fprintf(stderr,"reemplazo-dato\n %s\n", (char*)(*reemplazo_de_borrado)->dato);
-            fprintf(stderr,"checkpoint\n");
-            //void* dato = nodo_destruir(*raiz);
-            //fprintf(stderr,"dato destruido\n %s\n", (char*)dato);
-            fprintf(stderr,"izq-dato\n %s\n", (char*)(*izq)->dato);
-            fprintf(stderr,"der-dato\n %s\n", (char*)(*der)->dato);
-            fprintf(stderr,"reemplazo-dato\n %s\n", (char*)(*reemplazo_de_borrado)->dato);
-
             if((*reemplazo_de_borrado) != (*izq))
             (*reemplazo_de_borrado)->izq = (*izq);
             if((*reemplazo_de_borrado) != (*der))
