@@ -10,7 +10,6 @@
 #define CONSTANTE_DISMINUCION_DE_TABLA 2 //se achica a 1/cte
 
 typedef enum {VACIO, OCUPADO, BORRADO} estado_t;
-typedef enum {AGRANDAR, ACHICAR} redimension_t;
 
 typedef struct{
     char* clave;
@@ -50,9 +49,10 @@ static size_t funcion_hashing(const char* clave, size_t largo_hash){
     return (size_t) jenkins_one_at_a_time_hash((const uint8_t*)clave, strlen(clave)) % largo_hash;
 }
 
-//copia a posicion el nuevo dato o lo reemplaza
+
 static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* clave, void* dato){
     if(hash->tabla[posicion].estado==OCUPADO){
+        if(hash->destructor!=NULL)
         hash->destructor(hash->tabla[posicion].dato);
         hash->tabla[posicion].dato = dato;
         return true;
@@ -71,29 +71,21 @@ static bool copiar_a_posicion_hash(size_t posicion, hash_t* hash, const char* cl
 }
 
 //a es el nro devulto por la funcion de hashing
-static size_t encontrar_posicion(size_t a, elemento_t* tabla, size_t tamano_tabla, const char* clave){
-    while(tabla[a].estado==OCUPADO || tabla[a].estado==BORRADO){
-       // if(tabla[a].estado==BORRADO) continue;
-    if(tabla[a].estado==OCUPADO){
-        if(strcmp(tabla[a].clave, clave)==0)
-            return a;
+static size_t encontrar_posicion(size_t posicion, elemento_t* tabla, size_t tamano_tabla, const char* clave){
+    while(tabla[posicion].estado==OCUPADO || tabla[posicion].estado==BORRADO){
+    if(tabla[posicion].estado==OCUPADO){
+        if(strcmp(tabla[posicion].clave, clave)==0)
+            return posicion;
     } 
-
-        a++;
-        if(a==tamano_tabla)
-            a=0;
+    posicion++;
+    if(posicion==tamano_tabla)
+        posicion=0;
     }
-    return a;
+    return posicion;
 }
 
 
-static bool redimensionar_hash(hash_t* hash, redimension_t cte_redim){
-    size_t tamano_nuevo;
-    if(cte_redim==AGRANDAR)
-        tamano_nuevo = hash->tamano_tabla * CONSTANTE_AUMENTO_DE_TABLA;
-    else
-        tamano_nuevo = hash->tamano_tabla / CONSTANTE_DISMINUCION_DE_TABLA;
-
+static bool redimensionar_hash(hash_t* hash, size_t tamano_nuevo){
     elemento_t* nueva_tabla = malloc(sizeof(elemento_t)* tamano_nuevo);
     if(nueva_tabla==NULL) return false;
     hash->cantidad_elementos_acumulados = 0;
@@ -141,44 +133,33 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
     if(((float)(hash->cantidad_elementos_acumulados)/(float)(hash->tamano_tabla)) > (float)0.7)
-        if(!redimensionar_hash(hash, AGRANDAR)) return false;
-
-    size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
-    if(hash->tabla[nro_hasheo].estado==OCUPADO){
-        if(hash->destructor!=NULL)
-        hash->destructor(hash->tabla[nro_hasheo].dato);
-        hash->tabla[nro_hasheo].dato = dato;
-        return true;
-    }
+        if(!redimensionar_hash(hash, hash->tamano_tabla * CONSTANTE_AUMENTO_DE_TABLA)) return false;
+    size_t nro_hasheo = encontrar_posicion(funcion_hashing(clave, hash->tamano_tabla), hash->tabla, hash->tamano_tabla, clave);
     if(!copiar_a_posicion_hash(nro_hasheo, hash, clave, dato)) return false;
     return true;
 }
 
 void *hash_borrar(hash_t *hash, const char *clave){
-    size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo, hash->tabla, hash->tamano_tabla, clave);
+    size_t nro_hasheo = encontrar_posicion(funcion_hashing(clave, hash->tamano_tabla), hash->tabla, hash->tamano_tabla, clave);
     if(hash->tabla[nro_hasheo].estado==OCUPADO){
         void* dato = hash->tabla[nro_hasheo].dato;
         hash->tabla[nro_hasheo].estado=BORRADO;
         free(hash->tabla[nro_hasheo].clave);
         hash->cantidad_elementos_reales --;
+        if((hash->cantidad_elementos_acumulados - hash->cantidad_elementos_reales)>(hash->tamano_tabla/3))
+            redimensionar_hash(hash, hash->tamano_tabla / CONSTANTE_DISMINUCION_DE_TABLA);
         return dato;
     }
-        if((hash->cantidad_elementos_acumulados - hash->cantidad_elementos_reales)>(hash->tamano_tabla/3))
-        if(!redimensionar_hash(hash, ACHICAR)) return false;
     return NULL;
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
-    size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo,hash->tabla,hash->tamano_tabla,clave);
+    size_t nro_hasheo = encontrar_posicion(funcion_hashing(clave, hash->tamano_tabla),hash->tabla,hash->tamano_tabla,clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO ? hash->tabla[nro_hasheo].dato : NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
-    size_t nro_hasheo = funcion_hashing(clave, hash->tamano_tabla);
-    nro_hasheo = encontrar_posicion(nro_hasheo,hash->tabla,hash->tamano_tabla,clave);
+    size_t nro_hasheo = encontrar_posicion(funcion_hashing(clave, hash->tamano_tabla),hash->tabla,hash->tamano_tabla,clave);
     return hash->tabla[nro_hasheo].estado==OCUPADO;
 }
 
@@ -191,7 +172,7 @@ void hash_destruir(hash_t *hash){
         if(hash->tabla[i].estado==OCUPADO){
             if(hash->destructor!=NULL)
                 hash->destructor(hash->tabla[i].dato);
-        free(hash->tabla[i].clave);
+            free(hash->tabla[i].clave);
         }
     }
     free(hash->tabla);
@@ -205,9 +186,8 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
     iterador->hash = hash;
 
     size_t i=0;
-    for(; i<hash->tamano_tabla; i++){
+    for(; i<hash->tamano_tabla; i++)
         if(hash->tabla[i].estado==OCUPADO) break;
-    }
     iterador->actual = i;
     return iterador;
 }
@@ -215,9 +195,8 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 bool hash_iter_avanzar(hash_iter_t *iter){
     if(hash_iter_al_final(iter)) return false;
     size_t i;
-    for(i=iter->actual+1; i<iter->hash->tamano_tabla; i++){
+    for(i=iter->actual+1; i<iter->hash->tamano_tabla; i++)
         if(iter->hash->tabla[i].estado==OCUPADO) break;
-    }
     iter->actual = i;
     return true;
 }
