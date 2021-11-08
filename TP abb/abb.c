@@ -130,7 +130,6 @@ size_t abb_cantidad(const abb_t *arbol){
     if(arbol->raiz == NULL){
         return 0;
     }
-    //fprintf(stderr,"aca seguro\n");
     return abb_cantidad_(arbol->raiz);
 }
 
@@ -172,14 +171,12 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol, abb
             return dato;
         }
         if((*raiz)->izq==NULL){
-            fprintf(stderr, "IZQUIERDA == NULL\n\n");
             abb_nodo_t* reemplazo = (*raiz)->der;
             void* dato = nodo_destruir(*raiz);
             *raiz = reemplazo;
             return dato;
         }
         if((*raiz)->der==NULL){
-            fprintf(stderr, "DERECHA == NULL\n\n");
             abb_nodo_t* reemplazo = (*raiz)->izq;
             void* dato = nodo_destruir(*raiz);
             *raiz = reemplazo;
