@@ -271,12 +271,12 @@ void prueba_abb_insertar_borrar_3(){
 
     abb_t* abb = abb_crear(strcmp,NULL);
 
-    char *clave1 = "2", *valor1 = "2";
-    char *clave2 = "1", *valor2 = "1";
-    char *clave3 = "3", *valor3 = "3";
-    char *clave4 = "4", *valor4 = "4";
-    char *clave5 = "5", *valor5 = "5";
-    char *clave6 = "6", *valor6 = "6";
+    char *clave1 = "pedo", *valor1 = "menem";
+    char *clave2 = "caca", *valor2 = "el diego";
+    char *clave3 = "pis", *valor3 = "la fafafa";
+    char *clave4 = "culo", *valor4 = "viva milei";
+    char *clave5 = "pito", *valor5 = "asi o mas pelotudo";
+    char *clave6 = "galleta", *valor6 = "dale que so vo";
 
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1));
     print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
