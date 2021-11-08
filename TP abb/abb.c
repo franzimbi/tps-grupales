@@ -64,9 +64,11 @@ static bool abb_guardar_(abb_nodo_t** raiz, const char *clave, void *dato, abb_t
     }
 
     if(arbol->cmp(clave, (*raiz)->clave) == 0){
+
         if(arbol->destruir_dato!= NULL)
             arbol->destruir_dato((*raiz)->dato);
         (*raiz)->dato=dato;
+        return true;
     }
     
     //fprintf(stderr,"seguro la palma aca\n");
@@ -149,17 +151,10 @@ void abb_destruir(abb_t *arbol){
 }
 
 static abb_nodo_t* nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
-    if((*raiz)->der==NULL){       
-        abb_nodo_t** aux = &(*raiz);
-        if((*raiz)->izq!=NULL)
-            (*padre)->der = (*raiz)->izq;
-        
-        if((*padre)->der!=NULL){
-            return *aux;
-        }
-
-        else (*padre)->der = NULL;
-        return *aux;
+    if((*raiz)->der==NULL){
+        abb_nodo_t* aux = (*raiz);
+        (*raiz) = (aux)->izq;
+        return aux;
     }
     *padre = *raiz;
     return nodo_todo_der(&(*raiz)->der, &(*padre));
@@ -188,14 +183,14 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
             *raiz = reemplazo;
             return dato;
         }else{
-            abb_nodo_t* reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));           
+            abb_nodo_t* reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));
             abb_nodo_t* izq = (*raiz)->izq;
             abb_nodo_t* der = (*raiz)->der;
-            if((reemplazo_de_borrado) != (izq))
-            (reemplazo_de_borrado)->izq = (izq);
-            if((reemplazo_de_borrado) != (der))
-            (reemplazo_de_borrado)->der = (der);
-            return NULL;
+            void* dato = nodo_destruir(*raiz);
+            (*raiz) = reemplazo_de_borrado;
+            reemplazo_de_borrado->izq = izq;
+            reemplazo_de_borrado->der = der;
+            return dato;
         }
     }
     abb_nodo_t** aux = &(*raiz);
@@ -253,6 +248,7 @@ bool abb_iter_in_al_final(const abb_iter_t *iter){
 
 void abb_iter_in_destruir(abb_iter_t* iter){
     pila_destruir(iter->pila);
+    free(iter);
 }
 
 bool abb_iter_in_avanzar(abb_iter_t *iter){
