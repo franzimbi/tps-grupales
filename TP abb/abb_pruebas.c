@@ -417,8 +417,7 @@ void prueba_abb_insertar_borrar(){
 
 }
 
-void pruebas_abb_catedra()
-{
+void pruebas_abb_estudiante(){
     prueba_crear_abb_vacio();
     prueba_iterar_abb_vacio();
     prueba_abb_insertar();
@@ -427,11 +426,7 @@ void pruebas_abb_catedra()
     prueba_abb_borrar();
     prueba_abb_clave_vacia();
     prueba_hash_valor_null();
-    prueba_abb_volumen(5000, true);
+    prueba_abb_volumen(50, true);
     prueba_abb_iterar();
     prueba_abb_insertar_borrar();
-}
-
-int main(void){
-    pruebas_abb_catedra();
 }
