@@ -271,12 +271,12 @@ void prueba_abb_insertar_borrar_3(){
 
     abb_t* abb = abb_crear(strcmp,NULL);
 
-    char *clave1 = "pedo", *valor1 = "menem";
-    char *clave2 = "caca", *valor2 = "el diego";
-    char *clave3 = "pis", *valor3 = "la fafafa";
-    char *clave4 = "culo", *valor4 = "viva milei";
-    char *clave5 = "pito", *valor5 = "asi o mas pelotudo";
-    char *clave6 = "galleta", *valor6 = "dale que so vo";
+    char *clave1 = "4", *valor1 = "4";
+    char *clave2 = "2", *valor2 = "2";
+    char *clave3 = "6", *valor3 = "6";
+    char *clave4 = "1", *valor4 = "1";
+    char *clave5 = "3", *valor5 = "3";
+    char *clave6 = "5", *valor6 = "5";
 
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1));
     print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
@@ -327,25 +327,25 @@ void prueba_abb_insertar_borrar_3(){
     print_test("Prueba abb obtener clave6 es valor6", abb_obtener(abb, clave6) == valor6);
     print_test("Prueba abb pertenece clave6, es true", abb_pertenece(abb, clave6));
 
-    print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave6) == valor6);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 5);
+    print_test("Prueba abb borrar clave2, es valor2", abb_borrar(abb, clave2) == valor2);
+    print_test("Prueba abb la cantidad de elementos es 5", abb_cantidad(abb) == 5);
     
-
-    print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave4) == valor4);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 4);
-
-    print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave5) == valor5);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 3);
-    
-    
-    print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave2) == valor2);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 2);
-
-
-    print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave3) == valor3);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 1);
 
     print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave1) == valor1);
+    print_test("Prueba abb la cantidad de elementos es 5", abb_cantidad(abb) == 4);
+
+    print_test("Prueba abb borrar clave5, es valor5", abb_borrar(abb, clave5) == valor5);
+    print_test("Prueba abb la cantidad de elementos es 3", abb_cantidad(abb) == 3);
+    
+    
+    print_test("Prueba abb borrar clave4, es valor4", abb_borrar(abb, clave4) == valor4);
+    print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
+
+
+    print_test("Prueba abb borrar clave3, es valor3", abb_borrar(abb, clave3) == valor3);
+    print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
+
+    print_test("Prueba abb borrar clave6, es valor6", abb_borrar(abb, clave6) == valor6);
     print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
 
     abb_destruir(abb);
