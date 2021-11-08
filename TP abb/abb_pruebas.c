@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h> 
-/*
+
 static void prueba_crear_abb_vacio()
 {
     printf("\n\nINICIO PRUEBAS ABB VACIO\n\n");
@@ -229,7 +229,7 @@ void prueba_abb_insertar_borrar(){
 
     abb_destruir(abb);
 
-} */
+} 
 
 void prueba_abb_insertar_borrar_2(){
 
@@ -266,11 +266,11 @@ void prueba_abb_insertar_borrar_2(){
 
 void pruebas_abb_catedra()
 {
-    //prueba_crear_abb_vacio();
-    //prueba_abb_insertar();
-    //prueba_iterar_abb_vacio();
-    //prueba_abb_iterar();
-    //prueba_abb_insertar_borrar();
+    prueba_crear_abb_vacio();
+    prueba_abb_insertar();
+    prueba_iterar_abb_vacio();
+    prueba_abb_iterar();
+    prueba_abb_insertar_borrar();
     prueba_abb_insertar_borrar_2();
 }
 

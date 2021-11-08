@@ -148,18 +148,18 @@ void abb_destruir(abb_t *arbol){
     free(arbol);
 }
 
-static abb_nodo_t** nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
+static abb_nodo_t* nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
     if((*raiz)->der==NULL){       
         abb_nodo_t** aux = &(*raiz);
         if((*raiz)->izq!=NULL)
             (*padre)->der = (*raiz)->izq;
         
         if((*padre)->der!=NULL){
-            return aux;
+            return *aux;
         }
 
         else (*padre)->der = NULL;
-        return aux;
+        return *aux;
     }
     *padre = *raiz;
     return nodo_todo_der(&(*raiz)->der, &(*padre));
@@ -188,13 +188,13 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
             *raiz = reemplazo;
             return dato;
         }else{
-            abb_nodo_t** reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));           
-            abb_nodo_t** izq = &(*raiz)->izq;
-            abb_nodo_t** der = &(*raiz)->der;
-            if((*reemplazo_de_borrado) != (*izq))
-            (*reemplazo_de_borrado)->izq = (*izq);
-            if((*reemplazo_de_borrado) != (*der))
-            (*reemplazo_de_borrado)->der = (*der);
+            abb_nodo_t* reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));           
+            abb_nodo_t* izq = (*raiz)->izq;
+            abb_nodo_t* der = (*raiz)->der;
+            if((reemplazo_de_borrado) != (izq))
+            (reemplazo_de_borrado)->izq = (izq);
+            if((reemplazo_de_borrado) != (der))
+            (reemplazo_de_borrado)->der = (der);
             return NULL;
         }
     }
