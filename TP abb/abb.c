@@ -194,7 +194,7 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol, abb
             return dato;
         }
     }
-
+ 
     abb_nodo_t** aux = &(*raiz);
     if(arbol->cmp(clave, (*raiz)->clave)<0){
         return abb_borrar_(&(*aux)->izq, clave, arbol,aux);
