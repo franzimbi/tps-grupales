@@ -378,7 +378,7 @@ void prueba_abb_insertar_borrar(){
     print_test("Prueba abb pertenece clave5, es true", abb_pertenece(abb, clave5));
 
     //borrar
-    print_test("\nPrueba abb borrar clave2, es valor2", abb_borrar(abb, clave2) == valor2);
+    print_test("Prueba abb borrar clave2, es valor2", abb_borrar(abb, clave2) == valor2);
     print_test("Prueba abb la cantidad de elementos es 5", abb_cantidad(abb) == 5);
     
     print_test("Prueba abb borrar clave6, es valor6", abb_borrar(abb, clave6) == valor6);
@@ -396,7 +396,7 @@ void prueba_abb_insertar_borrar(){
     print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
 
     print_test("Prueba abb borrar clave5, es valor5", abb_borrar(abb, clave5) == valor5);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);  
+    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
 
     abb_destruir(abb);
 
@@ -414,9 +414,5 @@ void pruebas_abb_estudiante(){
     prueba_abb_volumen(50, true);
     prueba_abb_iterar(); 
     prueba_abb_insertar_borrar();
-}
-
-int main(void){
-    pruebas_abb_estudiante();
-    return 0;
+    printf("\n\n- - - - FIN DE TODAS LAS PRUEBAS - - - -\n\n");
 }
