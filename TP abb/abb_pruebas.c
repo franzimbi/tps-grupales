@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h> 
 
-/*
 static void prueba_crear_abb_vacio(){
     printf("\n\nINICIO PRUEBAS ABB VACIO\n\n");
     abb_t* abb = abb_crear(strcmp,NULL);
@@ -326,7 +325,7 @@ static void prueba_abb_iterar(){
 
     abb_iter_in_destruir(iter);
     abb_destruir(abb2);
-} */
+} 
 
 void prueba_abb_insertar_borrar(){
 
@@ -334,7 +333,7 @@ void prueba_abb_insertar_borrar(){
 
     abb_t* abb = abb_crear(strcmp,NULL);
 
-    /* char *clave4 = "4", *valor4 = "4";
+     char *clave4 = "4", *valor4 = "4";
     char *clave2 = "2", *valor2 = "2";
     char *clave1 = "1", *valor1 = "1";
     char *clave3 = "3", *valor3 = "3";
@@ -397,38 +396,14 @@ void prueba_abb_insertar_borrar(){
     print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
 
     print_test("Prueba abb borrar clave5, es valor5", abb_borrar(abb, clave5) == valor5);
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);  */
-
-    char *valor9 = "9", *valor5 = "5", *valor7 = "7", *valor3 = "3", *valor1 = "1", *valor4 = "4",
-        *valor6 = "6", *valor8 = "8", *valor10 = "10";
-
-    abb_guardar(abb, "9", valor9);
-    abb_guardar(abb, "5", valor5);
-    abb_guardar(abb, "7", valor7);
-    abb_guardar(abb, "3", valor3);
-    abb_guardar(abb, "1", valor1);
-    abb_guardar(abb, "4", valor4);
-    abb_guardar(abb, "6", valor6);
-    abb_guardar(abb, "8", valor8);
-    abb_guardar(abb, "10", valor10);
-
-    print_test("cantidad es 9:", abb_cantidad(abb)==9);
-    fprintf(stderr, "quise borrar 5: %s\n", (char*) abb_borrar(abb, "3"));
-    //print_test("borro 5:", abb_borrar(abb, "5")==valor5);
-    //print_test("los hijos siguen estando: ", abb_pertenece(abb, "") && abb_pertenece(abb, "7") && abb_pertenece(abb, "1") && abb_pertenece(abb, "8")
-    //                                        && abb_pertenece(abb, "4") && abb_pertenece(abb, "6"));
-    fprintf(stderr, "cantidad ahora: %zu\n", abb_cantidad(abb));
-    //print_test("cantidad es 8:", abb_cantidad(abb)==8);
-    //print_test("borro 7:", abb_borrar(abb, valor7)==valor7);
-    //print_test("borro 4:", abb_borrar(abb, valor4)==valor4);
-
+    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);  
 
     abb_destruir(abb);
 
 }
 
 void pruebas_abb_estudiante(){
-    /*prueba_crear_abb_vacio();
+    prueba_crear_abb_vacio();
     prueba_iterar_abb_vacio();
     prueba_abb_insertar();
     prueba_abb_reemplazar();
@@ -437,7 +412,7 @@ void pruebas_abb_estudiante(){
     prueba_abb_clave_vacia();
     prueba_hash_valor_null();
     prueba_abb_volumen(50, true);
-    prueba_abb_iterar(); */
+    prueba_abb_iterar(); 
     prueba_abb_insertar_borrar();
 }
 

@@ -149,14 +149,13 @@ void abb_destruir(abb_t *arbol){
     free(arbol);
 }
 
-static abb_nodo_t* nodo_todo_der(abb_nodo_t** raiz, abb_nodo_t** padre){
+static abb_nodo_t* nodo_todo_der( abb_nodo_t** raiz){
     if((*raiz)->der==NULL){
         abb_nodo_t* aux = (*raiz);
         (*raiz) = (aux)->izq;
         return aux;
     }
-    *padre = *raiz;
-    return nodo_todo_der(&(*raiz)->der, &(*padre));
+    return nodo_todo_der(&(*raiz)->der);
 }
 
 static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol, abb_nodo_t** padre){
@@ -182,7 +181,7 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol, abb
             *raiz = reemplazo;
             return dato;
         }else{
-            abb_nodo_t* reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq, &(*raiz));
+            abb_nodo_t* reemplazo_de_borrado = nodo_todo_der(&(*raiz)->izq);
             abb_nodo_t* izq = (*raiz)->izq;
             abb_nodo_t* der = (*raiz)->der;
             void* dato = nodo_destruir(*raiz);
@@ -194,7 +193,6 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol, abb
             return dato;
         }
     }
-
     abb_nodo_t** aux = &(*raiz);
     if(arbol->cmp(clave, (*raiz)->clave)<0){
         return abb_borrar_(&(*aux)->izq, clave, arbol,aux);
@@ -219,7 +217,7 @@ static void abb_in_order_(abb_nodo_t *raiz, bool visitar(const char *, void *, v
     abb_in_order_(raiz->der, visitar, extra);
 }
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
-    return abb_in_order_(arbol->raiz, visitar, extra);
+    abb_in_order_(arbol->raiz, visitar, extra);
 }
 
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
