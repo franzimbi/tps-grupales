@@ -310,7 +310,7 @@ static void prueba_lista_iterador_externo_casos_medio(){
 }
 
 static void pruebas_de_cantidad_lista_e_iterar(){
-    printf("PRUEBAS DE CANTIDAD LISTAS\n");
+    printf("\nPRUEBAS DE CANTIDAD LISTA\n");
 
     char** array = malloc(sizeof(char*) * CANTIDAD_DATOS );
     if(array == NULL){
@@ -335,12 +335,14 @@ static void pruebas_de_cantidad_lista_e_iterar(){
     print_test("crear iterador de la lista", iter!=NULL);
 
     ok = true;
+    int i=CANTIDAD_DATOS-1;
     printf("Iterando elementos:\n");
     while (!lista_iter_al_final(iter)){
+        ok &= (char*) lista_iter_ver_actual(iter) == array[i--];
+        ok &= lista_iter_avanzar(iter);
         
-        lista_iter_avanzar(iter);
     }
-    print_test("iter avanzar hasta el final", ok);
+    print_test("iter avanzar hasta el final, validando actual", ok);
 
     print_test("destuir iterador de la lista", true);
     lista_iter_destruir(iter);

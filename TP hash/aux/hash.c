@@ -26,7 +26,7 @@ struct hash{
 };
 
 struct hash_iter{
-    long actual;
+    size_t actual;
     const struct hash* hash;
 };
 
@@ -184,8 +184,11 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
     if(iterador==NULL) return NULL;
 
     iterador->hash = hash;
-    iterador->actual = -1;
-    hash_iter_avanzar(iterador);
+
+    size_t i=0;
+    for(; i<hash->tamano_tabla; i++)
+        if(hash->tabla[i].estado==OCUPADO) break;
+    iterador->actual = i;
     return iterador;
 }
 
