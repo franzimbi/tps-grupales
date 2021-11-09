@@ -208,14 +208,16 @@ void* abb_borrar(abb_t *arbol, const char *clave){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - ITERADORES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-static void abb_in_order_(abb_nodo_t *raiz, bool visitar(const char *, void *, void *), void *extra){
+static bool abb_in_order_(abb_nodo_t *raiz, bool visitar(const char *, void *, void *), void *extra){
     if(raiz==NULL)
-        return;
+        return true;
 
-    abb_in_order_(raiz->izq, visitar, extra);
-    if(!visitar(raiz->clave, raiz->dato, extra)) return;
-    abb_in_order_(raiz->der, visitar, extra);
+    if(!abb_in_order_(raiz->izq, visitar, extra)) return false;
+    if(!visitar(raiz->clave, raiz->dato, extra)) return false;
+    if (!abb_in_order_(raiz->der, visitar, extra)) return false;
+    return true;
 }
+
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
     abb_in_order_(arbol->raiz, visitar, extra);
 }
