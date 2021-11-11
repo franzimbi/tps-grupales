@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #define TAMANO_INICIAL 20
+#define CONSTANTE_REDIMENSION_DESENCOLAR 4
 
 struct heap{
     void** datos;
@@ -106,9 +107,22 @@ bool heap_encolar(heap_t *heap, void *elem){
 }
 
 void *heap_ver_max(const heap_t *heap){
-
+    return heap_esta_vacio(heap) ? NULL : heap->datos[0];
 }
 
 void *heap_desencolar(heap_t *heap){
-    
+    if(heap_esta_vacio(heap)) return NULL;
+
+    if(heap->cant * CONSTANTE_REDIMENSION_DESENCOLAR <= heap->tam){
+        if(heap->tam /2 <= TAMANO_INICIAL){
+            heap_redimensionar(heap, TAMANO_INICIAL);
+        }else{
+            heap_redimensionar(heap, heap->tam/2 );
+        }
+    }
+    void* dato = heap->datos[0];
+    heap->cant --;
+    swap(heap->datos, 0, heap->cant);
+    downheap(heap->datos, heap->cant, 0, heap->cmp);
+    return dato;
 }
