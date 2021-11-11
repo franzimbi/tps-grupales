@@ -1,6 +1,7 @@
 #include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TAMANO_INICIAL 20
 #define CONSTANTE_REDIMENSION_DESENCOLAR 4
@@ -36,7 +37,7 @@ static void upheap(void** arr, size_t hijo, cmp_func_t cmp){
 }
 
 static void downheap(void** arr, size_t cant, size_t padre, cmp_func_t cmp){
-    if(padre == cant -1) return;
+    if(padre == cant) return;
 
     size_t hijo_izq = (2 * padre) + 1;
     size_t hijo_der = (2 * padre) + 2;
@@ -57,26 +58,50 @@ static bool heap_redimensionar(heap_t* heap, size_t nuevo_tamano){
     return true;
 }
 
-void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
-
+static void heapify(void** arr, size_t n, cmp_func_t cmp){
+    for(size_t i=n-1; i<=0; i--){
+        downheap(arr, n, i, cmp);
+    }
 }
 
-heap_t *heap_crear(cmp_func_t cmp){
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+    heapify(elementos, cant, cmp);
+    size_t tamano = cant;
+    while(tamano>1){
+        swap(elementos, 0, tamano);
+        downheap(elementos, tamano-1, 0, cmp);
+    }
+}
+
+static heap_t *heap_crear_(cmp_func_t cmp, size_t tamano, size_t cantidad){
     heap_t* nuevo = malloc(sizeof(heap_t));
     if(nuevo == NULL) return NULL;
 
-    nuevo->datos = malloc(sizeof(void*) * TAMANO_INICIAL);
+    nuevo->datos = malloc(sizeof(void*) * tamano);
     if(nuevo->datos == NULL){
         free(nuevo);
         return NULL;
     }
-    nuevo->cant = 0;
-    nuevo->tam = TAMANO_INICIAL;
+    nuevo->cant = cantidad;
+    nuevo->tam = tamano;
     nuevo->cmp = cmp;
     return nuevo;
 }
 
+heap_t *heap_crear_(cmp_func_t cmp){
+    return heap_crear_(cmp, TAMANO_INICIAL, 0);
+}
+//es como un heapify
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
+    size_t tamano = TAMANO_INICIAL;
+    if(tamano < n)
+        tamano = n;
+    
+    heap_t* heap = heap_crear_(cmp, tamano, n);
+    if(heap == NULL) return NULL;
+
+    memcpy(heap->datos, arreglo, sizeof(void*) * n);
+    heapify(heap->datos, heap->cant, cmp);
 
 }
 
