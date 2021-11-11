@@ -19,16 +19,16 @@ static void swap(void** arr, size_t p1, size_t p2){
 
 static int minimo(void** arr, cmp_func_t cmp, size_t padre, size_t hijo_izq, size_t hijo_der){
     size_t minimo = padre;
-    if(cmp(arr[minimo], arr[hijo_izq]) > 0)
+    if(cmp(arr[minimo], arr[hijo_izq]) < 0)
         minimo = hijo_izq;
-    return cmp(arr[minimo], arr[hijo_der] > 0) ? hijo_der : minimo;
+    return cmp(arr[minimo], arr[hijo_der] < 0) ? hijo_der : minimo;
 }
 
 static void upheap(void** arr, size_t hijo, cmp_func_t cmp){
     if(hijo == 0) return;
 
     size_t padre = (hijo - 1)/2;
-    if(cmp(arr[padre], arr[hijo]) > 0){
+    if(cmp(arr[padre], arr[hijo]) < 0){
         swap(arr, padre, hijo);
         upheap(arr, padre, cmp);
     }
@@ -44,6 +44,16 @@ static void downheap(void** arr, size_t cant, size_t padre, cmp_func_t cmp){
         swap(arr, padre, min);
         downheap(arr, cant, min, cmp);
     }
+}
+
+static bool heap_redimensionar(heap_t* heap, size_t nuevo_tamano){
+    void** aux = realloc(heap->datos, sizeof(void*) * nuevo_tamano);
+    if(aux == NULL){
+        return false;
+    }
+    heap->datos = aux;
+    heap->tam = nuevo_tamano;
+    return true;
 }
 
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
@@ -88,7 +98,11 @@ bool heap_esta_vacio(const heap_t *heap){
 }
 
 bool heap_encolar(heap_t *heap, void *elem){
-    
+    if(heap->tam == heap->cant)
+        if(!heap_redimensionar(heap, heap->tam * 2)) return false;
+    heap->datos[heap->cant] = elem;
+    upheap(heap->datos, heap->cant, heap->cmp);
+    heap->cant ++;
 }
 
 void *heap_ver_max(const heap_t *heap){
@@ -96,5 +110,5 @@ void *heap_ver_max(const heap_t *heap){
 }
 
 void *heap_desencolar(heap_t *heap){
-
+    
 }
