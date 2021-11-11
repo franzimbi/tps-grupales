@@ -53,7 +53,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp);
  * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
  * Post: se llamó a la función indicada con cada elemento del heap. El heap
  * dejó de ser válido. */
-void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e));
+void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *));
 
 /* Devuelve la cantidad de elementos que hay en el heap. */
 size_t heap_cantidad(const heap_t *heap);
