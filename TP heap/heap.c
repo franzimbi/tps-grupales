@@ -19,11 +19,11 @@ static void swap(void** arr, size_t p1, size_t p2){
     arr[p2]= aux;
 }
 
-static int minimo(void** arr, cmp_func_t cmp, size_t padre, size_t hijo_izq, size_t hijo_der){
+static size_t minimo(void** arr, cmp_func_t cmp, size_t padre, size_t hijo_izq, size_t hijo_der){
     size_t minimo = padre;
     if(cmp(arr[minimo], arr[hijo_izq]) < 0)
         minimo = hijo_izq;
-    return cmp(arr[minimo], arr[hijo_der] < 0) ? hijo_der : minimo;
+    return cmp(arr[minimo], arr[hijo_der]) < 0 ? hijo_der : minimo;
 }
 
 static void upheap(void** arr, size_t hijo, cmp_func_t cmp){
@@ -73,7 +73,7 @@ void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
     }
 }
 
-static heap_t *heap_crear_(cmp_func_t cmp, size_t tamano, size_t cantidad){
+static heap_t* heap_crear_(cmp_func_t cmp, size_t tamano, size_t cantidad){
     heap_t* nuevo = malloc(sizeof(heap_t));
     if(nuevo == NULL) return NULL;
 
@@ -88,7 +88,7 @@ static heap_t *heap_crear_(cmp_func_t cmp, size_t tamano, size_t cantidad){
     return nuevo;
 }
 
-heap_t *heap_crear_(cmp_func_t cmp){
+heap_t* heap_crear(cmp_func_t cmp){
     return heap_crear_(cmp, TAMANO_INICIAL, 0);
 }
 //es como un heapify
@@ -102,7 +102,11 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 
     memcpy(heap->datos, arreglo, sizeof(void*) * n);
     heapify(heap->datos, heap->cant, cmp);
-
+    
+    /* for(size_t i=0; i<n; i++){
+        fprintf(stderr, "%ls\n", (int*) heap->datos[i]);
+    } */
+    return heap;
 }
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *)){
@@ -129,6 +133,7 @@ bool heap_encolar(heap_t *heap, void *elem){
     heap->datos[heap->cant] = elem;
     upheap(heap->datos, heap->cant, heap->cmp);
     heap->cant ++;
+    return true;
 }
 
 void *heap_ver_max(const heap_t *heap){
