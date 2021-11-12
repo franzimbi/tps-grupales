@@ -39,10 +39,6 @@ typedef struct heap heap_t;
  */
 heap_t *heap_crear(cmp_func_t cmp);
 
-
-void imprimir_heap(const heap_t* heap);
-
-
 /*
  * Constructor alternativo del heap. Además de la función de comparación,
  * recibe un arreglo de valores con que inicializar el heap. Complejidad

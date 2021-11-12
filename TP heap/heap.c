@@ -152,12 +152,3 @@ void *heap_desencolar(heap_t *heap){
     downheap(heap->datos, heap->cant, 0, heap->cmp);
     return dato;
 }
-
-void imprimir_heap(const heap_t* heap){
-    fprintf(stderr, "CANTIDAD: %zu\n TAMANO: %zu\n", heap->cant, heap->tam);
-    for(size_t i=0; i<heap->cant; i++){
-        void* aux = heap->datos[i];
-        fprintf(stderr, "%i\t", (int*) *aux);
-    }
-    fprintf(stderr, "\n");
-}
