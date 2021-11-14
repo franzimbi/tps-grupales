@@ -36,26 +36,25 @@ static void upheap(void** arr, size_t hijo, cmp_func_t cmp){
     }
 
 }
+static size_t hijo_valido(void** arr, size_t cant, size_t hijo_der, size_t hijo_izq, size_t padre, cmp_func_t cmp){
+    if(hijo_der>=cant){
+        
+        if(cmp(arr[padre],arr[hijo_izq]) <= 0 )return hijo_izq;
+        else return padre;
 
+    } else return minimo(arr, cmp, padre, hijo_izq, hijo_der); 
+}
 static void downheap(void** arr, size_t cant, size_t padre, cmp_func_t cmp){
     if(padre == cant) return;
 
-    size_t min;
+    
     size_t hijo_izq = (2 * padre) + 1;
     size_t hijo_der = (2 * padre) + 2;
 
-    if(hijo_izq>=cant){
-        return;
-    }
-    if(hijo_der>=cant){
-        if(cmp(arr[padre],arr[hijo_izq]) <= 0 ){
-            min = hijo_izq;
-        }
-        else min = padre;
-    }
-    else{
-        min =  minimo(arr, cmp, padre, hijo_izq, hijo_der);
-    }
+    if(hijo_izq>=cant) return;
+
+    size_t min = hijo_valido(arr,cant,hijo_der,hijo_izq,padre, cmp);
+    
     if(min != padre){
         swap(arr, padre, min);
         downheap(arr, cant, min, cmp);
@@ -73,7 +72,7 @@ static bool heap_redimensionar(heap_t* heap, size_t nuevo_tamano){
 }
 
 static void heapify(void** arr, size_t n, cmp_func_t cmp){
-    for(size_t i=0; i<n; ++i){
+    for(size_t i = 0; i < n; ++i){
         downheap(arr, n, n-i-1, cmp);
     }
 }
@@ -81,10 +80,10 @@ static void heapify(void** arr, size_t n, cmp_func_t cmp){
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
     heapify(elementos, cant, cmp);
     size_t tamano = 0;
-    while(tamano<=cant){
-        swap(elementos, 0, cant-tamano);
-        downheap(elementos, cant-tamano, 0, cmp);
-        tamano ++;
+    while(tamano<cant){
+        swap(elementos, 0, cant - tamano - 1);
+        downheap(elementos, cant - tamano - 1, 0, cmp);
+        tamano++;
     }
 }
 
