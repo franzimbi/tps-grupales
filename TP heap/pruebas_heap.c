@@ -178,7 +178,9 @@ void pruebas_heap_estudiante(void){
     prueba_volumen();
 }
 
+/*
 int main(void){
     pruebas_heap_estudiante();
     return 0;
 }
+*/
