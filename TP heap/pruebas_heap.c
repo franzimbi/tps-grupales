@@ -157,16 +157,41 @@ static void prueba_heapsort(){
     for(size_t i=0; i<CANTIDAD_ARREGLO; i++){
         if(strcmp(arreglo[i], ordenado[i])!=0)
             ok = false;
-        printf("%s\t", arreglo[i]);
     }
-    printf("\n");
     print_test("Verifico que el arreglo este bien ordenado", ok);
 }
 
-static void prueba_volumen(){
+static void prueba_volumen(size_t largo, bool debug){
     printf("\n\nINICIO PRUEBA DE VOLUMEN\n\n");
 
+    heap_t* heap = heap_crear((int (*)(const void *, const void *)) strcmp);
+    print_test("Se creo un heap", heap);
+
+    const size_t largo_clave = 10;
+    char** claves = malloc(sizeof(char*) * largo);
+
+    bool ok = true;
+    for (size_t i = 0; i < largo; i++) {
+        claves[i] = malloc(sizeof(char) * largo_clave);
+        strcpy(claves[i], "ABCD");
+        ok = heap_encolar(heap, (void*) claves[i]);
+        if (!ok) break;
+    }
+    if(debug) print_test("Prueba heap almacenar muchos elementos", ok);
+    if(debug) print_test("Prueba heap la cantidad de elementos es correcta", heap_cantidad(heap) == largo);
+
+    for(size_t i = 0; i < largo; i++){
+        void* aux = heap_desencolar(heap);
+        if(aux == NULL)
+            ok = false;
+        free(aux);
+        if (!ok) break;
+    }
+    if (debug) print_test("Prueba heap desencolar muchos elementos", ok);
+    if (debug) print_test("Prueba heap la cantidad de elementos es correcta", heap_desencolar(heap) == 0);
     
+    free(claves);
+    heap_destruir(heap, NULL);
 }
 void pruebas_heap_estudiante(void){
     prueba_heap_vacio();
@@ -175,12 +200,14 @@ void pruebas_heap_estudiante(void){
     pruebas_elementos_igual_prioridad();
     prueba_crear_con_arreglo();
     prueba_heapsort();
-    prueba_volumen();
+    prueba_volumen(50, true);
 }
 
-/*
-int main(void){
+#ifndef CORRECTOR  // Para que no dé conflicto con el main() del corrector.
+
+int main(void) {
     pruebas_heap_estudiante();
-    return 0;
+    return failure_count() > 0;  // Indica si falló alguna prueba.
 }
-*/
+
+#endif
