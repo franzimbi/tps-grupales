@@ -1,0 +1,104 @@
+#include "usuarios.h"
+#include "hash.h"
+#include "heap.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+
+
+// LOGIN Y LOGOUT
+
+hash{
+    char* usuario;
+    void* usuario_t*;
+}
+
+typedef struct{
+    usuario_t* login;
+    size_t id_global;
+    char** usuarios;
+    size_t total_users;
+    hash_t* hash_usuarios;
+    publicacion_t** publiocaciones;
+    size_t total_publicaciones;
+}global_login_t;
+
+typedef struct{
+    heap_t* publicaciones (de publicacion_t);
+    char* nombre_usuario;
+    size_t id_usuario;
+}usuario_t;
+
+
+
+publicar post:
+o(ulog(p)) -> encolar en cada usuario;
+
+ver sguiente post:
+o(log(p)) -> desencolar en si mismo;
+
+typedef struct{
+    size_t id;
+    char* post;
+    abb_t* likes;
+}publicacion_t;
+
+
+// -- - - - - - -- - - - - -----------------------------------------------------    -----------------------------------------
+
+typedef struct{
+    usuario_t* login;
+    size_t id_publicacion;
+    char** usuarios;
+    size_t total_users;
+    hash_t* hash_usuarios;
+}global_t;
+
+typedef struct{
+    heap_t* publicaciones;
+    char* nombre_usuario;
+    size_t id_usuario;
+}usuario_t;
+
+typedef struct{
+    size_t id;
+    char* post;
+    abb_t* likes;
+}publicacion_t;
+
+int cmp_publicacion(publicacion_t* a, publicacion_t* b){
+
+}
+
+static publicacion_t* publicacion_crear()
+
+static usuario_t* usuario_crear(char* nombre, size_t id){
+    usuario_t* nuevo = malloc(sizeof(usuario_t));
+    if(nuevo == NULL) return NULL;
+
+    nuevo->id_usuario = id;
+    nuevo->nombre_usuario = malloc(sizeof(char) * (strlen(nombre) + 1));
+    if(nuevo->nombre_usuario == NULL){
+        free(nuevo);
+        return NULL;
+    }
+    strcpy(nuevo->nombre_usuario, nombre);
+    nuevo->publicaciones = heap_crear(cmp_publicacion);
+    if(nuevo->publicaciones == NULL){
+        free(nuevo->nombre_usuario);
+        free(nuevo);
+    }
+    return nuevo;
+}
+
+static void usuario_destruir(usuario_t* usuario){
+    heap_destruir(usuario->publicaciones);
+}
+global_t* global_crear(FILE* txt_users){
+    global_t* global = malloc(sizeof(global_t));
+    if(global = NULL) return NULL;
+
+    global->login = NULL;
+    global->id_publicacion = 0;
+    global->hash_usuarios = hash_crear()
+}
