@@ -45,6 +45,6 @@ bool usuario_guardar_publicacion(usuario_t* usuario, publicacion_t* publicacion)
     return heap_encolar(usuario, publicacion);
 }
 
-publicacion_t* usuario_ver_siguiente_publicacion(usuario_t* usuario){
+publicacion_t* usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
     return heap_desencolar(usuario->publicaciones);
 }
