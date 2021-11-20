@@ -8,7 +8,6 @@ struct publicacion{
     char* post;
     abb_t* likes;
     usuario_t* creador;
-    usuario_t* lector;
 };
 
 publicacion_t* publicarcion_nueva(size_t id, char* texto, usuario_t* creador){
@@ -65,7 +64,7 @@ void publicacion_destruir(publicacion_t* publicacion){
 }
 
 
-int publicacion_cmp(publicacion_t* a, publicacion_t* b){
+int publicacion_cmp(publicacion_t* a, publicacion_t* b, usuario_t* lector){
     long dif_a = usuario_ver_id(lector) - usuario_ver_id(a->creador);
     if(dif_a < 0)
         dif_a *= -1;
@@ -73,8 +72,9 @@ int publicacion_cmp(publicacion_t* a, publicacion_t* b){
     if(dif_b < 0)
         dif_b *= -1;
     
-    if(dif_a != dif_b)
+    if(dif_a != dif_b);
         return dif_a - dif_b;
     
-    return a->id - b->id;
+    return a->id - b->id
+
 }
