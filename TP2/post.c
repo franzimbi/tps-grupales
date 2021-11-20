@@ -7,10 +7,11 @@ struct publicacion{
     size_t id;
     char* post;
     abb_t* likes;
-    char* creador;
+    usuario_t* creador;
+    usuario_t* lector;
 };
 
-publicacion_t* publicarcion_nueva(size_t id, char* texto, char* creador){
+publicacion_t* publicarcion_nueva(size_t id, char* texto, usuario_t* creador){
     publicacion_t* publicacion = malloc(sizeof(publicacion_t));
     if(publicacion == NULL) return NULL;
 
@@ -21,13 +22,7 @@ publicacion_t* publicarcion_nueva(size_t id, char* texto, char* creador){
         free(publicacion);
         return NULL;
     }
-    tamano_texto = strlen(creador) + 1;
-    publicacion->creador = malloc(sizeof(char) * tamano_texto);
-    if(publicacion->post == NULL){
-        free(publicacion->post);
-        free(publicacion);
-        return NULL;
-    }
+    publicacion->creador = creador;
     publicacion->likes = abb_crear(strcmp, NULL);
     if(publicacion->likes = NULL){
         free(publicacion->post);
@@ -47,7 +42,7 @@ bool publicacion_likear(publicacion_t* publicacion, char* usuario){
 
 void imprimir_publicacion(const publicacion_t* publicacion){
     printf("Post ID %zu\n", publicacion->id);
-    printf("%s dijo: %s\n", publicacion->creador, publicacion->post);
+    printf("%s dijo: %s\n", usuario_ver_nombre(publicacion->creador), publicacion->post);
     printf("Likes: %zu\n", abb_cantidad(publicacion->likes));
 }
 
@@ -65,7 +60,21 @@ bool imprimir_likes_publicacion(const publicacion_t* publicacion){
 
 void publicacion_destruir(publicacion_t* publicacion){
     abb_destruir(publicacion->likes);
-    free(publicacion->creador);
     free(publicacion->post);
     free(publicacion);
+}
+
+
+int publicacion_cmp(publicacion_t* a, publicacion_t* b){
+    long dif_a = usuario_ver_id(lector) - usuario_ver_id(a->creador);
+    if(dif_a < 0)
+        dif_a *= -1;
+    long dif_b = usuario_ver_id(lector) - usuario_ver_id(b->creador);
+    if(dif_b < 0)
+        dif_b *= -1;
+    
+    if(dif_a != dif_b)
+        return dif_a - dif_b;
+    
+    return a->id - b->id;
 }

@@ -5,6 +5,7 @@
 #include "post.h"
 
 typedef struct usuario usuario_t;
+typedef void (*destructor_usuario)(usuario_t*);
 
 //recibe el nombre del nuevo usuario, su id y la funcion de comparacion de las publicaciones.
 //devuelve el usuario o NULL si fallo.
