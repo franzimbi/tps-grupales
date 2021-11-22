@@ -2,7 +2,6 @@
 #define POST_H
 
 #include <stdlib.h>
-#include "usuarios.h"
 
 typedef struct publicacion publicacion_t;
 typedef void (*destructor_publicacion)(publicacion_t*);

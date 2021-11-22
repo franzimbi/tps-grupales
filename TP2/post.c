@@ -13,8 +13,10 @@ publicacion_t* publicacion_nueva(size_t id, char* texto, size_t id_creador){
     if(publicacion == NULL) return NULL;
 
     publicacion->id = id;
+    publicacion->id_creador = id_creador;
     size_t tamano_texto = strlen(texto) + 1;
     publicacion->mensaje = malloc(sizeof(char) * tamano_texto);
+    strcpy(publicacion->mensaje, texto);
     if(publicacion->mensaje == NULL){
         free(publicacion);
         return NULL;

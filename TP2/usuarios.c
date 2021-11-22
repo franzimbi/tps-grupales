@@ -18,6 +18,8 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
         free(nuevo);
         return NULL;
     }
+    strcpy(nuevo->nombre, nombre);
+    nuevo->id = id;
     nuevo->feed = heap_crear(cmp_publicaciones);
     if(nuevo->feed == NULL){
         free(nuevo->nombre);
@@ -41,11 +43,11 @@ char* usuario_ver_nombre(const usuario_t* usuario){
     return usuario->nombre;
 }
 
-bool usuario_guardar_publicacion(usuario_t* usuario, publicacion_t* publicacion){
-    return heap_encolar(usuario, publicacion);
+bool usuario_guardar_publicacion(usuario_t* usuario, void* publicacion){
+    return heap_encolar(usuario->feed, publicacion);
 }
 
-publicacion_t* usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
+void* usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
     return heap_desencolar(usuario->feed);
 }
 

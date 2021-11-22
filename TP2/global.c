@@ -16,7 +16,7 @@ typedef struct{
 typedef struct{
     vector_t* vector_usr;
     hash_t* hash_usr;
-    vector_t* vector_likes;
+    vector_t* vector_likes; //guarda abb con los likes de cada post segun su id
     vector_t* vector_posts;
 }global_t;
 
@@ -88,8 +88,7 @@ global_t* crear_global(FILE* f){
     }
     int largo_linea = 0;
     char* nombre = malloc(sizeof(char) * 50);
-
-    while( (largo_linea = getline(nombre,50,f)) != -1  ){
+    while( ( largo_linea = getline(nombre,50,f) ) != -1 ){
         nombre[largo_linea-1] = '\0'; // para no guardar el \n
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), publicacion_cmp);
         if(nuevo_usuario == NULL){
@@ -97,8 +96,8 @@ global_t* crear_global(FILE* f){
             free(nuevo);
             return NULL;
         }
-        if(!vector_agregar(nuevo->vector_usr, nuevo_usuario)){
-            vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
+        if(!vector_agregar(nuevo->vector_usr, (void*) nuevo_usuario)){
+            vector_destruir(nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
             free(nuevo);
             return NULL;
         }
@@ -112,6 +111,14 @@ global_t* crear_global(FILE* f){
     if(nuevo->vector_posts == NULL){
         vector_destruir(nuevo->vector_usr, (void (*) (void*)) usuario_destruir);
         hash_borrar(nuevo->hash_usr, NULL);
+        free(nuevo);
+        return NULL;
+    }
+    nuevo->vector_likes = vector_crear(CANTIDAD_INICIAL);
+    if(nuevo->vector_posts == NULL){
+        vector_destruir(nuevo->vector_usr, (void (*) (void*)) usuario_destruir);
+        hash_borrar(nuevo->hash_usr, NULL);
+        vector_destruir(nuevo->vector_likes, NULL);
         free(nuevo);
         return NULL;
     }
