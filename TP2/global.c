@@ -14,13 +14,16 @@ typedef struct{
 }vector_t;
 
 typedef struct{
-    usuario_t* usr_logeado;
-    vector_t* usuarios;
-    vector_t* publicaciones;
-    hash_t* hash_usuarios;
-    destructor_publicacion post_destruir;
-    destructor_usuario usr_destruir;
+    vector_t* vector_usr;
+    hash_t* hash_usr;
+    vector_t* vector_likes;
+    vector_t* vector_posts;
 }global_t;
+
+typedef struct{
+    size_t id_publicacion;
+    size_t prioridad;
+}post_con_prioridad_t;
 
 static vector_t* vector_crear(size_t tam){
     vector_t* nuevo = malloc(sizeof(vector_t));
@@ -70,12 +73,16 @@ static void* vector_obtener(vector_t* vector, size_t pos){
     return vector->datos[pos];
 }
 
+int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
+    a->prioridad - b->prioridad;
+}
+
 global_t* crear_global(FILE* f){
     global_t* nuevo = malloc(sizeof(global_t));
     if(nuevo == NULL) return NULL;
 
-    nuevo->usuarios = vector_crear(CANTIDAD_INICIAL);
-    if(nuevo->usuarios == NULL){
+    nuevo->vector_usr = vector_crear(CANTIDAD_INICIAL);
+    if(nuevo->vector_usr == NULL){
         free(nuevo);
         return NULL;
     }
@@ -84,33 +91,30 @@ global_t* crear_global(FILE* f){
 
     while( (largo_linea = getline(nombre,50,f)) != -1  ){
         nombre[largo_linea-1] = '\0'; // para no guardar el \n
-        usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->usuarios), publicacion_cmp);
+        usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), publicacion_cmp);
         if(nuevo_usuario == NULL){
-            vector_destruir (nuevo->usuarios, (void (*) (void *)) usuario_destruir);
+            vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
             free(nuevo);
             return NULL;
         }
-        if(!vector_agregar(nuevo->usuarios, nuevo_usuario)){
-            vector_destruir (nuevo->usuarios, (void (*) (void *)) usuario_destruir);
+        if(!vector_agregar(nuevo->vector_usr, nuevo_usuario)){
+            vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
             free(nuevo);
             return NULL;
         }
     }
     free(nombre);
-    nuevo->hash_usuarios = hash_crear(NULL);
-    for (size_t i = 0; i < vector_tamano(nuevo->usuarios); i++){
-        hash_guardar(nuevo->hash_usuarios,usuario_ver_nombre(vector_obtener(nuevo->usuarios, i)), vector_obtener(nuevo->usuarios, i));
+    nuevo->hash_usr = hash_crear(NULL);
+    for (size_t i = 0; i < vector_tamano(nuevo->vector_usr); i++){
+        hash_guardar(nuevo->hash_usr,usuario_ver_nombre(vector_obtener(nuevo->vector_usr, i)), vector_obtener(nuevo->vector_usr, i));
     }
-    nuevo->publicaciones = vector_crear(CANTIDAD_INICIAL);
-    if(nuevo->publicaciones == NULL){
-        vector_destruir(nuevo->usuarios, (void (*) (void*)) usuario_destruir);
-        hash_borrar(nuevo->hash_usuarios, NULL);
+    nuevo->vector_posts = vector_crear(CANTIDAD_INICIAL);
+    if(nuevo->vector_posts == NULL){
+        vector_destruir(nuevo->vector_usr, (void (*) (void*)) usuario_destruir);
+        hash_borrar(nuevo->hash_usr, NULL);
         free(nuevo);
         return NULL;
     }
-    nuevo->usr_destruir = usuario_destruir;
-    nuevo->post_destruir = publicacion_destruir;
-    nuevo->usr_logeado = NULL;
     return nuevo;
 }
 

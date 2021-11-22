@@ -5,9 +5,9 @@
 #include <string.h>
 
 struct usuario{
-    heap_t* publicaciones;
     char* nombre;
     size_t id;
+    heap_t* feed;
 };
 
 usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
@@ -18,8 +18,8 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
         free(nuevo);
         return NULL;
     }
-    nuevo->publicaciones = heap_crear(cmp_publicaciones);
-    if(nuevo->publicaciones == NULL){
+    nuevo->feed = heap_crear(cmp_publicaciones);
+    if(nuevo->feed == NULL){
         free(nuevo->nombre);
         free(nuevo);
         return NULL;
@@ -29,7 +29,7 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
 
 void usuario_destruir(usuario_t* usuario){
     free(usuario->nombre);
-    heap_destruir(usuario->publicaciones, NULL);
+    heap_destruir(usuario->feed, NULL);
     free(usuario);
 }
 
@@ -46,5 +46,9 @@ bool usuario_guardar_publicacion(usuario_t* usuario, publicacion_t* publicacion)
 }
 
 publicacion_t* usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
-    return heap_desencolar(usuario->publicaciones);
+    return heap_desencolar(usuario->feed);
+}
+
+bool feed_esta_al_final(usuario_t* usuario){
+    return heap_ver_max(usuario->feed) == NULL ? true : false;
 }
