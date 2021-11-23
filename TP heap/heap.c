@@ -5,6 +5,7 @@
 
 #define TAMANO_INICIAL 20
 #define CONSTANTE_REDIMENSION_DESENCOLAR 4
+#define CONSTANTE_CAMBIO_TAMANO 2
 
 struct heap{
     void** datos;
@@ -138,7 +139,7 @@ bool heap_esta_vacio(const heap_t *heap){
 
 bool heap_encolar(heap_t *heap, void *elem){
     if(heap->tam == heap->cant)
-        if(!heap_redimensionar(heap, heap->tam * 2)) return false;
+        if(!heap_redimensionar(heap, heap->tam * CONSTANTE_CAMBIO_TAMANO)) return false;
     heap->datos[heap->cant] = elem;
     upheap(heap->datos, heap->cant, heap->cmp);
     heap->cant ++;
@@ -152,10 +153,10 @@ void *heap_ver_max(const heap_t *heap){
 void *heap_desencolar(heap_t *heap){
     if(heap_esta_vacio(heap)) return NULL;
     if(heap->cant * CONSTANTE_REDIMENSION_DESENCOLAR <= heap->tam && heap->tam > TAMANO_INICIAL){
-        if(heap->tam /2 <= TAMANO_INICIAL){
+        if(heap->tam / CONSTANTE_CAMBIO_TAMANO <= TAMANO_INICIAL){
             heap_redimensionar(heap, TAMANO_INICIAL);
         }else{
-            heap_redimensionar(heap, heap->tam/2 );
+            heap_redimensionar(heap, heap->tam/CONSTANTE_CAMBIO_TAMANO );
         }
     }
 
