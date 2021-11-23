@@ -197,7 +197,7 @@ static void prueba_abb_clave_vacia(){
     abb_destruir(abb);
 }
 
-static void prueba_hash_valor_null(){
+static void prueba_abb_valor_null(){
     printf("\n\nINICIO PRUEBAS ABB VALOR NULL\n\n");
     abb_t* abb = abb_crear(strcmp, NULL);
 
@@ -218,18 +218,19 @@ static void prueba_abb_volumen(size_t largo, bool debug){
     printf("\n\nINICIO PRUEBAS ABB VOLUMEN\n\n");
     abb_t* abb = abb_crear(strcmp, NULL);
 
-    const size_t largo_clave = 10;
-    char (*claves)[largo_clave] = malloc(largo * largo_clave);
-
-    unsigned* valores[largo];
-
+    const size_t largo_clave = 100;
+    char** claves = malloc(sizeof(char*) * largo);
 
     bool ok = true;
-    for (unsigned i = 0; i < largo; i++) {
-        valores[i] = malloc(sizeof(int));
-        sprintf(claves[i], "%08d", i);
-        *valores[i] = i;
-        ok = abb_guardar(abb, claves[i], valores[i]);
+    char *string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
+    size_t j = 0;
+    size_t largo_string = strlen(string);
+    for (int i = 0; i < largo; i++) {
+        claves[i] = malloc(sizeof(char) * largo_clave);
+        if(j == largo_string - 1) j = 0;
+        strcpy(claves[i], string + j);
+        j++;
+        ok = abb_guardar(abb, (void*) claves[i], claves[i]);
         if (!ok) break;
     }
 
@@ -237,38 +238,19 @@ static void prueba_abb_volumen(size_t largo, bool debug){
     if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
 
 
-    for (size_t i = 0; i < largo; i++) {
-        ok = abb_pertenece(abb, claves[i]);
-        if (!ok) break;
-        ok = abb_obtener(abb, claves[i]) == valores[i];
-        if (!ok) break;
-    }
-
-    if (debug) print_test("Prueba abb pertenece y obtener muchos elementos", ok);
-    if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
-
-    
-    for (size_t i = 0; i < largo; i++) {
-        ok = abb_borrar(abb, claves[i]) == valores[i];
+    for(size_t i = 0; i < largo; i++){
+        void* aux = abb_borrar(abb, (const char*) claves[i]);
+        if(aux == NULL)
+            ok = false;
+        free(aux);
         if (!ok) break;
     }
 
     if (debug) print_test("Prueba abb borrar muchos elementos", ok);
-    if (debug) print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
-
-    abb_destruir(abb);
-    abb = abb_crear(strcmp, free);
-
+    if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == 0);
     
-    ok = true;
-    for (size_t i = 0; i < largo; i++) {
-        ok = abb_guardar(abb, claves[i], valores[i]);
-        if (!ok) break;
-    }
-
     free(claves);
     abb_destruir(abb);
-
 }
 
 static ssize_t buscar(const char* clave, char* claves[], size_t largo){
@@ -410,15 +392,15 @@ void pruebas_abb_estudiante(){
     prueba_abb_reemplazar_con_destruir();
     prueba_abb_borrar();
     prueba_abb_clave_vacia();
-    prueba_hash_valor_null();
-    prueba_abb_volumen(50, true);
+    prueba_abb_valor_null();
+    prueba_abb_volumen(500, true);
     prueba_abb_iterar(); 
     prueba_abb_insertar_borrar();
     printf("\n\n- - - - FIN DE TODAS LAS PRUEBAS - - - -\n\n");
 }
 
-/*
+
 int main(void){
     pruebas_abb_estudiante();
     return 0;
-} */
+} 
