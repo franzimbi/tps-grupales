@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "global.h"
 #include "hash.h"
 #include "usuarios.h"
 #include "post.h"
@@ -8,32 +8,32 @@
 
 #define CANTIDAD_INICIAL 30
 
-typedef struct{
+struct vector{
     void** datos;
     size_t tamano;
     size_t capacidad;
-}vector_t;
+};
 
-typedef struct{
+struct global{
     vector_t* vector_usr;
     hash_t* hash_usr;
     vector_t* vector_likes; //guarda abb con los likes de cada post segun su id
     vector_t* vector_posts;
     size_t id_post_global;
     usuario_t* login;
-}global_t;
+};
 
-typedef struct{
+struct post_con_prioridad{
     size_t id_publicacion;
     size_t prioridad;
-}post_con_prioridad_t;
+};
 
 //- - - - - - - - - - - - -  - - - - VECTOR DINAMICO - - - - - - - - - - - - - - - - - - - - 
 static vector_t* vector_crear(size_t tam){
     vector_t* nuevo = malloc(sizeof(vector_t));
     if(nuevo == NULL) return NULL;
     nuevo->datos = malloc(sizeof(void*) * tam);
-    if(nuevo->tamano == NULL){
+    if(nuevo->datos == NULL){
         free(nuevo);
         return NULL;
     }
@@ -70,12 +70,20 @@ static bool vector_agregar(vector_t* vector, void* dato){
     return true;
 }
 
-static vector_tamano(vector_t* vector){
+static size_t vector_tamano(vector_t* vector){
     return vector->tamano;
 }
 
 static void* vector_obtener(vector_t* vector, size_t pos){
     return vector->datos[pos];
+}
+
+
+//--------------------------------------------------------------------------------------------
+
+static bool print_clave(const char* clave, void* _, void* __){
+    printf("%s\n", clave);
+    return true;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,8 +102,9 @@ global_t* global_crear(FILE* f){
         return NULL;
     }
     int largo_linea = 0;
-    char* nombre = malloc(sizeof(char) * 50);
-    while( ( largo_linea = getline(nombre,50,f) ) != -1 ){
+    size_t largo_nombre = 50;
+    char* nombre = malloc(sizeof(char) * largo_nombre);
+    while( ( largo_linea = getline(&nombre, &largo_nombre, f) ) != -1 ){
         nombre[largo_linea-1] = '\0'; // para no guardar el \n
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), (int (*)(const void*, const void*)) publicacion_cmp);
         if(nuevo_usuario == NULL){
@@ -137,32 +146,49 @@ global_t* global_crear(FILE* f){
 void global_destruir(global_t* global){
     vector_destruir(global->vector_usr, (void (*) (void*)) usuario_destruir);
     vector_destruir(global->vector_posts, (void (*) (void*)) publicacion_destruir);
-    vector_destruir(global->vector_likes, abb_destruir);
+    vector_destruir(global->vector_likes, (void (*) (void*)) abb_destruir);
     hash_destruir(global->hash_usr);
     free(global);
 }
 
-bool usuario_login(global_t* global, char* usuario){
-    if(global->login != NULL)
+static bool usuario_login_(global_t* global, char* usuario){
+    if(global->login != NULL){
+        fprintf(stderr,"Error: Ya habia un usuario loggeado.");
         return false;
+    }
     
     usuario_t* usr_logeado = hash_obtener(global->hash_usr, usuario);
-    if(usr_logeado == NULL)
+    if(usr_logeado == NULL){
+        fprintf(stderr,"Error: Ya habia un usuario loggeado.");
         return false;
+    }
     global->login = usr_logeado;
+    printf("hola %s\n", usuario_ver_nombre(usr_logeado));
     return true;
 }
 
-bool usuario_logout(global_t* global){
-    if(global->login == NULL)
+bool usuario_login(void* global, void* usuario){
+    return usuario_login_((global_t*) global, (char*) usuario);
+}
+
+static bool usuario_logout_(global_t* global, char* _){
+    if(global->login == NULL){
+        fprintf(stderr, "Error: no habia usuario loggeado.\n");
         return false;
+    }    
     global->login = NULL;
     return true;
 }
 
-bool post_publicar(global_t* global, char* texto){
-    if(global->login == NULL)
+bool usuario_logout(void* global, void* _){
+    return usuario_logout_((global_t*)global, (char*)_);
+}
+
+static bool post_publicar_(global_t* global, char* texto){
+    if(global->login == NULL){
+        fprintf(stderr, "Error: no habia usuario loggeado.\n");
         return false;
+    }
     publicacion_t* nuevo_post = publicacion_nueva(global->id_post_global, texto, usuario_ver_id(global->login));
     if(nuevo_post == NULL) return false;
 
@@ -187,4 +213,65 @@ bool post_publicar(global_t* global, char* texto){
     return true;
 }
 
+bool post_publicar(void* global, void* texto){
+    return post_publicar_((global_t*)global, (char*)texto);
+}
 
+static bool ver_siguiente_feed_(global_t* global){
+    if(feed_esta_al_final(global->login) || global->login == NULL){ 
+        fprintf(stderr, "Usuario no loggeado o no hay mas posts para ver.\n");        
+        return false;
+    }
+    void* publicacion = usuario_ver_siguiente_publicacion(global->login);
+    set_id_ultima_publicacion(global->login, publicacion_ver_id((publicacion_t*) publicacion));
+    printf("Post ID:%ld\n", publicacion_ver_id((publicacion_t*) publicacion));
+    printf("%s dijo: %s\n", (char*) vector_obtener(global->vector_usr, publicacion_ver_id_creador(publicacion)), publicacion_ver_mensaje(publicacion));
+    return true;
+}
+
+bool ver_siguiente_feed(void* global, void* _){
+    ver_siguiente_feed_((global_t*)global);
+}
+
+static bool likear_post_(global_t* global){
+    if(ver_id_ultima_publicacion(global->login) == -1 || global->login == NULL){
+        fprintf(stderr, "Error: Usuario no loggeado o Post inexistente.\n");
+        return false;
+    }
+
+    abb_guardar((abb_t *) vector_obtener(global->vector_likes,ver_id_ultima_publicacion(global->login)), usuario_ver_nombre(global->login),NULL);
+    printf("Post likeado\n");
+    return true;
+}
+
+bool likear_post(void* global, void* _){
+    likear_post_((global_t*) global);
+}
+
+static bool mostrar_likes_(global_t* global, size_t id_publicacion){
+    if(id_publicacion<0 || id_publicacion >= vector_tamano(global->vector_likes)){
+        fprintf(stderr, "Error: Post inexistente o sin likes.\n");
+        return false;
+    }
+
+    abb_in_order(vector_obtener(global->vector_likes, id_publicacion), print_clave,NULL);
+    return true;
+}
+
+bool mostrar_likes(void* global, void* id_publiacion){
+    return mostrar_likes_((global_t*) global, (size_t) id_publiacion);
+}
+
+int main(void){
+    FILE* archivo = fopen("04_usuarios", "r");
+    global_t* global = global_crear(archivo);
+
+    usuario_login(global, "barbara");
+    post_publicar(global, "booooeenasss");
+    set_id_ultima_publicacion(global->login, 0);
+    likear_post(global, 0);
+    mostrar_likes(global, 0);
+    fclose(archivo);
+    global_destruir(global);
+    return 0;
+}

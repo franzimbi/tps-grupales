@@ -18,6 +18,8 @@ size_t publicacion_ver_id(const publicacion_t* publicacion);
 //pre: la publicacion fue creada
 const char* publicacion_ver_mensaje(const publicacion_t* publicacion);
 
+size_t publicacion_ver_id_creador(const publicacion_t* publicacion);
+
 //desturye la publicacion
 //pre: la publacion fue creada
 void publicacion_destruir(publicacion_t* publicacion);

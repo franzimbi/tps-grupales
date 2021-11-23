@@ -36,4 +36,8 @@ void* usuario_ver_siguiente_publicacion(usuario_t* usuario);
 //pre: el usuario fue creado
 bool feed_esta_al_final(usuario_t* usuario);
 
+void set_id_ultima_publicacion(usuario_t* usuario, size_t id_p_ultimo);
+
+long ver_id_ultima_publicacion(usuario_t* usuario);
+
 #endif

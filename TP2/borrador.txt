@@ -41,3 +41,5 @@ typedef struct{
 int cmp_publicacion(post_con_prioridad_t* a, post_con_prioridad_t* b){
     return a->prioridad - b->prioridad;
 }
+
+{a,b,c,d,e,f,g,h,i}

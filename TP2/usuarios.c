@@ -8,6 +8,7 @@ struct usuario{
     char* nombre;
     size_t id;
     heap_t* feed;
+    long id_p_ultima;
 };
 
 usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
@@ -26,6 +27,7 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
         free(nuevo);
         return NULL;
     }
+    nuevo->id_p_ultima = -1;
     return nuevo;
 }
 
@@ -52,5 +54,13 @@ void* usuario_ver_siguiente_publicacion(usuario_t* usuario){
 }
 
 bool feed_esta_al_final(usuario_t* usuario){
-    return heap_ver_max(usuario->feed) == NULL ? true : false;
+    return heap_ver_max(usuario->feed) == NULL;
+}
+
+void set_id_ultima_publicacion(usuario_t* usuario, size_t id_p_ultimo){
+    usuario->id_p_ultima = (long) id_p_ultimo;
+}
+
+long ver_id_ultima_publicacion(usuario_t* usuario){
+    return usuario->id_p_ultima;
 }
