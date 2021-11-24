@@ -230,11 +230,12 @@ static void prueba_abb_volumen(size_t largo, bool debug){
         if(j == largo_string - 1) j = 0;
         strcpy(claves[i], string + j);
         j++;
-        ok = abb_guardar(abb, (void*) claves[i], claves[i]);
+        ok = abb_guardar(abb, (void*) claves[i], NULL);
         if (!ok) break;
     }
 
     if (debug) print_test("Prueba abb almacenar muchos elementos", ok);
+    fprintf(stderr, "cantidad: %zu\n", abb_cantidad(abb));
     if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
 
 
@@ -242,7 +243,7 @@ static void prueba_abb_volumen(size_t largo, bool debug){
         void* aux = abb_borrar(abb, (const char*) claves[i]);
         if(aux == NULL)
             ok = false;
-        free(aux);
+        //free(aux);
         if (!ok) break;
     }
 

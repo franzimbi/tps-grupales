@@ -47,23 +47,14 @@ static void* nodo_destruir(abb_nodo_t* nodo){
     return aux;
 }
 
-static bool recursividad_bool(funcion_recursiva_bool funcion, abb_nodo_t**raiz, const char* clave, void* dato, abb_t* arbol){
+static abb_nodo_t** nodo_siguiente(abb_nodo_t**raiz, const char* clave, const abb_t* arbol){
     if (arbol->cmp(clave, (*raiz)->clave) < 0){
-        return funcion(&(*raiz)->izq, clave, dato, arbol);
+        return &(*raiz)->izq;
     } else {
-        return funcion(&(*raiz)->der, clave, dato, arbol);
+        return &(*raiz)->der;
     }
 }
 
-static void* recursividad_void_pointer(funcion_recursiva_void_pointer funcion, const abb_nodo_t* raiz, const char* clave, const abb_t* arbol){
-    if (arbol->cmp(clave, raiz->clave) == 0)
-        return raiz->dato;
-    if (arbol->cmp(clave, raiz->clave) < 0){
-        return funcion(raiz->izq, clave, arbol);
-    } else {
-        return funcion(raiz->der, clave, arbol);
-    }
-}
 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     abb_t* nuevo = malloc(sizeof(abb_t));
@@ -89,52 +80,39 @@ static bool abb_guardar_(abb_nodo_t** raiz, const char *clave, void *dato, abb_t
         (*raiz)->dato = dato;
         return true;
     }
-    /* if (arbol->cmp(clave, (*raiz)->clave)<0){
-        return abb_guardar_(&(*raiz)->izq, clave, dato, arbol);
-    } else {
-        return abb_guardar_(&(*raiz)->der, clave, dato, arbol);
-    } */
-    return recursividad_bool(abb_guardar_, &(*raiz), clave, dato, arbol);
-}
+    abb_nodo_t** aux = nodo_siguiente(raiz, clave, (const abb_t*) arbol);
+    return abb_guardar_(aux, clave, dato, arbol);
 
+}
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
     return abb_guardar_(&(arbol)->raiz, clave, dato, arbol);
 }
 
-static void *abb_obtener_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
+static void* abb_obtener_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
     if (raiz == NULL)
         return NULL;
-    /* if (arbol->cmp(clave, raiz->clave) == 0)
+    if (arbol->cmp(clave, raiz->clave) == 0)
         return raiz->dato;
-    if (arbol->cmp(clave, raiz->clave) < 0){
-        return abb_obtener_(raiz->izq, clave, arbol);
-    } else {
-        return abb_obtener_(raiz->der, clave, arbol);
-    } */
-    return recursividad_void_pointer(abb_obtener_, raiz, clave, arbol);
+    abb_nodo_t** aux = nodo_siguiente( (abb_nodo_t**) &raiz, clave, arbol);
+    return abb_obtener_(*aux, clave, arbol);
 }
 
 void* abb_obtener(const abb_t *arbol, const char *clave){
     return abb_obtener_(arbol->raiz, clave, arbol);
 }
 
-static bool abb_pertenece_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
+/*static bool abb_pertenece_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
     if (raiz == NULL)
         return false;
     if (arbol->cmp(clave, raiz->clave) == 0)
         return true;
-    if (arbol->cmp(clave, raiz->clave) < 0){
-        return abb_pertenece_(raiz->izq, clave, arbol);
-    }else{
-        return abb_pertenece_(raiz->der, clave, arbol);
-    } 
-}
+    abb_nodo_t** aux = nodo_siguiente( (abb_nodo_t**) &raiz, clave, arbol);
+    return abb_pertenece_( (const abb_nodo_t*)*aux, clave, arbol);
+}*/
 
 bool abb_pertenece(const abb_t *arbol, const char *clave){
-    return abb_pertenece_(arbol->raiz, clave, arbol);
+    return abb_obtener_(arbol->raiz, clave, arbol)!= NULL;
 }
-
-
 
 size_t abb_cantidad(const abb_t *arbol){
     return arbol->tamano;
@@ -201,11 +179,8 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
             return dato;
         }
     }
-    if (arbol->cmp(clave, (*raiz)->clave) < 0){
-        return abb_borrar_(&(*raiz)->izq, clave, arbol);
-    } else {
-        return abb_borrar_(&(*raiz)->der, clave, arbol);
-    } 
+    abb_nodo_t** aux = nodo_siguiente(raiz, clave, arbol);
+    return abb_borrar_(aux, clave, arbol);
 }
 
 void* abb_borrar(abb_t *arbol, const char *clave){
@@ -227,6 +202,13 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
     abb_in_order_(arbol->raiz, visitar, extra);
 }
 
+static void ciclo_apilar(abb_iter_t* iter, abb_nodo_t* raiz){
+    while (raiz != NULL){
+        pila_apilar(iter->pila, raiz);
+        raiz = raiz->izq;
+    }
+}
+
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     abb_iter_t* iter = malloc(sizeof(abb_iter_t));
     if (iter == NULL)
@@ -240,10 +222,11 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     abb_nodo_t* raiz = arbol->raiz;
     iter->raiz = raiz;
 
-    while (raiz != NULL){
+    /*while (raiz != NULL){
         pila_apilar(iter->pila, raiz);
         raiz = raiz->izq;
-    }
+    }*/
+    ciclo_apilar(iter, raiz);
     return iter;
 }
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
@@ -264,10 +247,11 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
     abb_nodo_t* aux = pila_desapilar(iter->pila);
     if (aux->der != NULL){
         aux = aux->der;
-        while (aux != NULL){
+        /*while (aux != NULL){
             pila_apilar(iter->pila, aux);
             aux = aux->izq;
-        }
+        } */
+        ciclo_apilar(iter, aux);
     }
     return true;
 }

@@ -47,7 +47,7 @@ static void* nodo_destruir(abb_nodo_t* nodo){
     return aux;
 }
 
-static abb_nodo_t** nodo_siguiente(abb_nodo_t**raiz, const char* clave, const abb_t* arbol){
+static abb_nodo_t** lado_por_el_que_sigo(abb_nodo_t**raiz, const char* clave, const abb_t* arbol){
     if (arbol->cmp(clave, (*raiz)->clave) < 0){
         return &(*raiz)->izq;
     } else {
@@ -80,7 +80,7 @@ static bool abb_guardar_(abb_nodo_t** raiz, const char *clave, void *dato, abb_t
         (*raiz)->dato = dato;
         return true;
     }
-    abb_nodo_t** aux = nodo_siguiente(raiz, clave, (const abb_t*) arbol);
+    abb_nodo_t** aux = lado_por_el_que_sigo(raiz, clave, (const abb_t*) arbol);
     return abb_guardar_(aux, clave, dato, arbol);
 
 }
@@ -93,22 +93,13 @@ static void* abb_obtener_(const abb_nodo_t *raiz, const char *clave, const abb_t
         return NULL;
     if (arbol->cmp(clave, raiz->clave) == 0)
         return raiz->dato;
-    abb_nodo_t** aux = nodo_siguiente( (abb_nodo_t**) &raiz, clave, arbol);
+    abb_nodo_t** aux = lado_por_el_que_sigo( (abb_nodo_t**) &raiz, clave, arbol);
     return abb_obtener_(*aux, clave, arbol);
 }
 
 void* abb_obtener(const abb_t *arbol, const char *clave){
     return abb_obtener_(arbol->raiz, clave, arbol);
 }
-
-/*static bool abb_pertenece_(const abb_nodo_t *raiz, const char *clave, const abb_t* arbol){
-    if (raiz == NULL)
-        return false;
-    if (arbol->cmp(clave, raiz->clave) == 0)
-        return true;
-    abb_nodo_t** aux = nodo_siguiente( (abb_nodo_t**) &raiz, clave, arbol);
-    return abb_pertenece_( (const abb_nodo_t*)*aux, clave, arbol);
-}*/
 
 bool abb_pertenece(const abb_t *arbol, const char *clave){
     return abb_obtener_(arbol->raiz, clave, arbol)!= NULL;
@@ -179,7 +170,7 @@ static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
             return dato;
         }
     }
-    abb_nodo_t** aux = nodo_siguiente(raiz, clave, arbol);
+    abb_nodo_t** aux = lado_por_el_que_sigo(raiz, clave, arbol);
     return abb_borrar_(aux, clave, arbol);
 }
 
