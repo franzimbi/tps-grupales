@@ -89,7 +89,7 @@ static bool print_clave(const char* clave, void* _, void* __){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
-    a->prioridad - b->prioridad;
+    a->prioridad - b->prioridad;                                                                 
 }
 
 global_t* global_crear(FILE* f){
@@ -249,7 +249,7 @@ bool likear_post(void* global, void* _){
 }
 
 static bool mostrar_likes_(global_t* global, size_t id_publicacion){
-    if(id_publicacion<0 || id_publicacion >= vector_tamano(global->vector_likes)){
+    if(id_publicacion<=0 || id_publicacion > vector_tamano(global->vector_likes)){
         fprintf(stderr, "Error: Post inexistente o sin likes.\n");
         return false;
     }
@@ -262,6 +262,7 @@ bool mostrar_likes(void* global, void* id_publiacion){
     return mostrar_likes_((global_t*) global, (size_t) id_publiacion);
 }
 
+/*
 int main(void){
     FILE* archivo = fopen("04_usuarios", "r");
     global_t* global = global_crear(archivo);
@@ -274,4 +275,4 @@ int main(void){
     fclose(archivo);
     global_destruir(global);
     return 0;
-}
+}/*

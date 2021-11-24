@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "global.h": "c",
+        "hash.h": "c",
+        "stdlib.h": "c",
+        "usuarios.h": "c",
+        "post.h": "c",
+        "string.h": "c",
+        "abb.h": "c",
+        "stdbool.h": "c"
+    }
+}
