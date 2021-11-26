@@ -47,16 +47,21 @@ static void* nodo_destruir(abb_nodo_t* nodo){
     return aux;
 }
 
-static abb_nodo_t* nodo_buscar(abb_nodo_t*raiz, const char* clave, const abb_t* arbol){
+static abb_nodo_t** lado_por_el_que_sigo(abb_nodo_t** raiz, const char* clave, const abb_t* arbol){
+    if (arbol->cmp(clave, (*raiz)->clave) < 0){
+        return &(*raiz)->izq;
+    } else {
+        return &(*raiz)->der;
+    }
+}
+
+static abb_nodo_t* nodo_obtener(abb_nodo_t* raiz, const char* clave, const abb_t* arbol){
     if (raiz == NULL)
         return NULL;
     if (arbol->cmp(clave, raiz->clave) == 0)
         return raiz;
-    if (arbol->cmp(clave, raiz->clave) < 0){
-        return nodo_buscar(raiz->izq, clave, arbol);
-    } else {
-        return nodo_buscar(raiz->der, clave, arbol);
-    } 
+    abb_nodo_t** aux = lado_por_el_que_sigo(&raiz, clave, arbol);
+    return nodo_obtener(*aux, clave, arbol);
 }
 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
@@ -82,25 +87,21 @@ static bool abb_guardar_(abb_nodo_t** raiz, const char *clave, void *dato, abb_t
         (*raiz)->dato = dato;
         return true;
     }
-    if (arbol->cmp(clave, (*raiz)->clave) < 0){
-        return abb_guardar_(&(*raiz)->izq, clave, dato, arbol);
-    } else {
-        return abb_guardar_(&(*raiz)->der, clave, dato, arbol);
-    }
+    abb_nodo_t** aux = lado_por_el_que_sigo(raiz, clave, arbol);
+    return abb_guardar_(aux, clave, dato, arbol);
 }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
     return abb_guardar_(&(arbol)->raiz, clave, dato, arbol);
-
 }
 
 void* abb_obtener(const abb_t *arbol, const char *clave){
-    abb_nodo_t* nodo = nodo_buscar( arbol->raiz, clave, arbol);
+    abb_nodo_t* nodo = nodo_obtener( (abb_nodo_t*) arbol->raiz, clave, arbol);
     return nodo != NULL ? nodo->dato : NULL;
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave){
-    abb_nodo_t* nodo = nodo_buscar( arbol->raiz, clave, arbol);
+    abb_nodo_t* nodo = nodo_obtener( (abb_nodo_t*) arbol->raiz, clave, arbol);
     return nodo != NULL;
 }
 
@@ -124,7 +125,7 @@ void abb_destruir(abb_t *arbol){
     free(arbol);
 }
 
-static abb_nodo_t* nodo_todo_der( abb_nodo_t** raiz){
+static abb_nodo_t* nodo_todo_der(abb_nodo_t** raiz){
     if ((*raiz)->der == NULL){
         abb_nodo_t* aux = (*raiz);
         (*raiz) = (aux)->izq;
@@ -133,7 +134,7 @@ static abb_nodo_t* nodo_todo_der( abb_nodo_t** raiz){
     return nodo_todo_der(&(*raiz)->der);
 }
 
-/*static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
+static void* abb_borrar_(abb_nodo_t** raiz, const char *clave, abb_t* arbol){
     if (*raiz == NULL)
         return NULL;
 
@@ -169,16 +170,12 @@ static abb_nodo_t* nodo_todo_der( abb_nodo_t** raiz){
             return dato;
         }
     }
-    if (arbol->cmp(clave, (*raiz)->clave) < 0){
-        return abb_borrar_(&(*raiz)->izq, clave, arbol);
-    }else{
-        return abb_borrar_(&(*raiz)->der, clave, arbol);
-    }
-}*/
+    abb_nodo_t** aux = lado_por_el_que_sigo(raiz, clave, arbol);
+    return abb_borrar_(aux, clave, arbol);
+}
 
 void* abb_borrar(abb_t *arbol, const char *clave){
-    //return abb_borrar_( &(arbol)->raiz, clave, arbol);
-    
+    return abb_borrar_( &(arbol)->raiz, clave, arbol);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - ITERADORES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -215,12 +212,8 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     }
     abb_nodo_t* raiz = arbol->raiz;
     iter->raiz = raiz;
-
-    /*while (raiz != NULL){
-        pila_apilar(iter->pila, raiz);
-        raiz = raiz->izq;
-    }*/
     ciclo_apilar(iter, raiz);
+
     return iter;
 }
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
@@ -239,13 +232,7 @@ void abb_iter_in_destruir(abb_iter_t* iter){
 bool abb_iter_in_avanzar(abb_iter_t *iter){
     if (abb_iter_in_al_final(iter)) return false;
     abb_nodo_t* aux = pila_desapilar(iter->pila);
-    if (aux->der != NULL){
-        aux = aux->der;
-        /*while (aux != NULL){
-            pila_apilar(iter->pila, aux);
-            aux = aux->izq;
-        } */
+    if (aux->der != NULL)
         ciclo_apilar(iter, aux);
-    }
     return true;
 }

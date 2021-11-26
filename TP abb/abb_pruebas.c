@@ -235,7 +235,6 @@ static void prueba_abb_volumen(size_t largo, bool debug){
     }
 
     if (debug) print_test("Prueba abb almacenar muchos elementos", ok);
-    fprintf(stderr, "cantidad: %zu\n", abb_cantidad(abb));
     if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
 
 
