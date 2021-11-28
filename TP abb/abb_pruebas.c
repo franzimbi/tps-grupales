@@ -218,19 +218,30 @@ static void prueba_abb_volumen(size_t largo, bool debug){
     printf("\n\nINICIO PRUEBAS ABB VOLUMEN\n\n");
     abb_t* abb = abb_crear(strcmp, NULL);
 
-    const size_t largo_clave = 100;
-    char** claves = malloc(sizeof(char*) * largo);
+
+// ---------------- STRIGNS RANDOM---------------
+    char** string = calloc(largo, sizeof(char*));
+    char* random;
+    for(size_t j = 0; j < largo; j++){
+        random = malloc(sizeof(char)* 5 +1);
+        for(size_t i = 0; i < 5; i++){
+            int aux = rand() % 126;
+            while(aux < 36){
+                aux = rand() % 126;
+            }
+            random[i] = (char) aux;
+        }
+        random[4] = '\0';
+        string[j] = malloc(sizeof(char) * 6 + 1);
+        strcpy(string[j], random);
+        free(random);
+    }
+//---------------------------------------------------
 
     bool ok = true;
-    char *string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
-    size_t j = 0;
-    size_t largo_string = strlen(string);
+    
     for (int i = 0; i < largo; i++) {
-        claves[i] = malloc(sizeof(char) * largo_clave);
-        if(j == largo_string - 1) j = 0;
-        strcpy(claves[i], string + j);
-        j++;
-        ok = abb_guardar(abb, (void*) claves[i], NULL);
+        ok = abb_guardar(abb, (void*) string[i], (void*) string[i]);
         if (!ok) break;
     }
 
@@ -239,17 +250,19 @@ static void prueba_abb_volumen(size_t largo, bool debug){
 
 
     for(size_t i = 0; i < largo; i++){
-        void* aux = abb_borrar(abb, (const char*) claves[i]);
+        void* aux = abb_borrar(abb, string[i]);
         if(aux == NULL)
             ok = false;
-        //free(aux);
         if (!ok) break;
     }
 
     if (debug) print_test("Prueba abb borrar muchos elementos", ok);
     if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == 0);
     
-    free(claves);
+    for(size_t i = 0; i<largo;i++){
+        free(string[i]);
+    }
+    free(string);
     abb_destruir(abb);
 }
 
@@ -393,7 +406,7 @@ void pruebas_abb_estudiante(){
     prueba_abb_borrar();
     prueba_abb_clave_vacia();
     prueba_abb_valor_null();
-    prueba_abb_volumen(500, true);
+    prueba_abb_volumen(1000, true);
     prueba_abb_iterar(); 
     prueba_abb_insertar_borrar();
     printf("\n\n- - - - FIN DE TODAS LAS PRUEBAS - - - -\n\n");
