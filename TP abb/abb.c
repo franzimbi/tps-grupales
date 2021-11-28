@@ -202,18 +202,18 @@ static void ciclo_apilar(abb_iter_t* iter, abb_nodo_t* raiz){
 
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     abb_iter_t* iter = malloc(sizeof(abb_iter_t));
-    if (iter == NULL)
+    if(iter==NULL)
         return NULL;
     
     iter->pila = pila_crear();
-    if (iter->pila == NULL){
+    if(iter->pila==NULL){
         free(iter);
         return NULL;
     }
     abb_nodo_t* raiz = arbol->raiz;
     iter->raiz = raiz;
-    ciclo_apilar(iter, raiz);
 
+    ciclo_apilar(iter, raiz);
     return iter;
 }
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
@@ -230,9 +230,11 @@ void abb_iter_in_destruir(abb_iter_t* iter){
 }
 
 bool abb_iter_in_avanzar(abb_iter_t *iter){
-    if (abb_iter_in_al_final(iter)) return false;
+    if(abb_iter_in_al_final(iter)) return false;
     abb_nodo_t* aux = pila_desapilar(iter->pila);
-    if (aux->der != NULL)
+    if(aux->der!=NULL){
+        aux = aux->der;
         ciclo_apilar(iter, aux);
+    }
     return true;
 }
