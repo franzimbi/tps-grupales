@@ -33,7 +33,7 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
 
 void usuario_destruir(usuario_t* usuario){
     free(usuario->nombre);
-    heap_destruir(usuario->feed, NULL);
+    heap_destruir(usuario->feed, free);
     free(usuario);
 }
 

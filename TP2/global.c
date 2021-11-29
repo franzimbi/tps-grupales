@@ -78,6 +78,18 @@ static void* vector_obtener(vector_t* vector, size_t pos){
     return vector->datos[pos];
 }
 
+static post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector){
+    post_con_prioridad_t* p_prioridad = malloc(sizeof (post_con_prioridad_t));
+    if(p_prioridad == NULL) return NULL;
+    
+    long dif_id = id_creador - id_lector;
+    if(dif_id < 0)
+        dif_id *= -1;
+    
+    p_prioridad->id_publicacion = id_post;
+    p_prioridad->prioridad = (size_t) dif_id;
+    return p_prioridad;
+}
 
 //--------------------------------------------------------------------------------------------
 
@@ -89,7 +101,12 @@ static bool print_clave(const char* clave, void* _, void* __){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
-    a->prioridad - b->prioridad;                                                                 
+    int dif = a->prioridad - b->prioridad; 
+    if(dif<-1)
+        dif *= -1;
+    if(dif != 0) return dif;
+    else
+        return a->id_publicacion - b->id_publicacion;
 }
 
 global_t* global_crear(FILE* f){
@@ -104,7 +121,7 @@ global_t* global_crear(FILE* f){
     int largo_linea = 0;
     size_t largo_nombre = 50;
     char* nombre = malloc(sizeof(char) * largo_nombre);
-    while( ( largo_linea = getline(&nombre, &largo_nombre, f) ) != -1 ){
+    while( ( largo_linea = getline(&nombre, &largo_nombre, f) ) != EOF ){
         nombre[largo_linea-1] = '\0'; // para no guardar el \n
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), (int (*)(const void*, const void*)) publicacion_cmp);
         if(nuevo_usuario == NULL){
@@ -159,7 +176,7 @@ static bool usuario_login_(global_t* global, char* usuario){
     
     usuario_t* usr_logeado = hash_obtener(global->hash_usr, usuario);
     if(usr_logeado == NULL){
-        fprintf(stderr,"Error: Ya habia un usuario loggeado.");
+        fprintf(stderr,"Error: Error: usuario no existente.");
         return false;
     }
     global->login = usr_logeado;
@@ -177,6 +194,7 @@ static bool usuario_logout_(global_t* global, char* _){
         return false;
     }    
     global->login = NULL;
+    printf("Adios\n");
     return true;
 }
 
@@ -202,8 +220,13 @@ static bool post_publicar_(global_t* global, char* texto){
         abb_destruir(likes_post);
         return false;
     }
+
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
-        if( !usuario_guardar_publicacion(vector_obtener(global->vector_usr, i), (void*) nuevo_post) ){
+        if(usuario_ver_id(global->login) == usuario_ver_id(global->vector_usr[i]))
+            continue;
+        post_con_prioridad_t* p_prioridad = post_con_prioridad_crear(publicacion_ver_id(nuevo_post), usuario_ver_id(global->login), usuario_ver_id(global->vector_usr[i]));
+        // VALIDAR 
+        if( !usuario_guardar_publicacion(vector_obtener(global->vector_usr, i), (void*) p_prioridad) ){
             publicacion_destruir(nuevo_post);
             abb_destruir(likes_post);
             return false;
@@ -222,10 +245,12 @@ static bool ver_siguiente_feed_(global_t* global){
         fprintf(stderr, "Usuario no loggeado o no hay mas posts para ver.\n");        
         return false;
     }
-    void* publicacion = usuario_ver_siguiente_publicacion(global->login);
-    set_id_ultima_publicacion(global->login, publicacion_ver_id((publicacion_t*) publicacion));
-    printf("Post ID:%ld\n", publicacion_ver_id((publicacion_t*) publicacion));
-    printf("%s dijo: %s\n", (char*) vector_obtener(global->vector_usr, publicacion_ver_id_creador(publicacion)), publicacion_ver_mensaje(publicacion));
+    post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
+    set_id_ultima_publicacion(global->login, p_prioridad->id_publicacion));
+    printf("Post ID:%zu\n", p_prioridad->id_publicacion);
+    printf("%s dijo: %s\n", (char*) vector_obtener(global->vector_usr, publicacion_ver_id_creador(vector_obtener(global->vector_posts, p_prioridad->id_publicacion)),
+                                    publicacion_ver_mensaje(vector_obtener(global->vector_posts, p_prioridad->id_publicacion)) );
+    free(p_prioridad);
     return true;
 }
 
@@ -261,18 +286,3 @@ static bool mostrar_likes_(global_t* global, size_t id_publicacion){
 bool mostrar_likes(void* global, void* id_publiacion){
     return mostrar_likes_((global_t*) global, (size_t) id_publiacion);
 }
-
-/*
-int main(void){
-    FILE* archivo = fopen("04_usuarios", "r");
-    global_t* global = global_crear(archivo);
-
-    usuario_login(global, "barbara");
-    post_publicar(global, "booooeenasss");
-    set_id_ultima_publicacion(global->login, 0);
-    likear_post(global, 0);
-    mostrar_likes(global, 0);
-    fclose(archivo);
-    global_destruir(global);
-    return 0;
-}/*

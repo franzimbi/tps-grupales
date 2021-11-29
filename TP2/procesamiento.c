@@ -1,10 +1,8 @@
+#include "procesamiento.h"
 #include "global.h"
-#include "hash.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef bool (*comando_t)(void*, void*);
 
 #define CANTIDAD_COMANDOS 6
 
@@ -23,8 +21,12 @@ hash_t* iniciar_diccionario(){
     return diccionario;
 }
 
-hash_t* buscar_comando(hash_t* diccionario, char* clave){
-    return hash_obtener(diccionario, clave);
+void cerrar_diccionario(hash_t* diccionario){
+    hash_destruir(diccionario);
+}
+
+comando_t* buscar_comando(hash_t* diccionario, char* clave){
+    return (comando_t*) hash_obtener(diccionario, clave);
 }
 
 bool string_a_nro(char* str, long* nro){
