@@ -215,7 +215,7 @@ static void prueba_abb_valor_null(){
 }
 
 static void prueba_abb_volumen(size_t largo, bool debug){
-    printf("\n\nINICIO PRUEBAS ABB VOLUMEN\n\n");
+    printf("\n\nINICIO PRUEBAS ABB VOLUMEN (%zu elementos)\n\n", largo);
     abb_t* abb = abb_crear(strcmp, NULL);
 
 
@@ -244,7 +244,7 @@ static void prueba_abb_volumen(size_t largo, bool debug){
         ok = abb_guardar(abb, (void*) string[i], (void*) string[i]);
         if (!ok) break;
     }
-
+    //fprintf(stderr, "Cantidad guardado: %zu\nLargo: %zu\n", abb_cantidad(abb), largo);
     if (debug) print_test("Prueba abb almacenar muchos elementos", ok);
     if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
 
@@ -406,14 +406,14 @@ void pruebas_abb_estudiante(){
     prueba_abb_borrar();
     prueba_abb_clave_vacia();
     prueba_abb_valor_null();
-    prueba_abb_volumen(1000, true);
+    prueba_abb_volumen(4000, true);
     prueba_abb_iterar(); 
     prueba_abb_insertar_borrar();
     printf("\n\n- - - - FIN DE TODAS LAS PRUEBAS - - - -\n\n");
 }
 
-/*
+
 int main(void){
     pruebas_abb_estudiante();
     return 0;
-} */
+}

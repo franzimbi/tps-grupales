@@ -17,12 +17,18 @@ void global_destruir(global_t* global);
 
 //logea a un usuario si no hay ninguno logeado. caso contrario devuelve un error.
 //pre: globar fue creada
-bool usuario_login(void* global, void* usuario);
+bool usuario_login(global_t* global, char* usuario);
 
-bool usuario_logout(void* global, void* _);
-bool post_publicar(void* global, void* texto);
-bool ver_siguiente_feed(void* global, void* _);
-bool likear_post(void* global, void* _);
-bool mostrar_likes(void* global, void* id_publicacion);
+//hace logout a un usuario si hay alguno logeado. caso contrario devuelve un error.
+//pre: globar fue creada
+bool usuario_logout(global_t* global);
+
+//realiza una publicacion disponible para todos en su feed. debe haber un usuario logeado
+//pre: global fue creada
+bool post_publicar(global_t* global, char* texto);
+
+bool ver_siguiente_feed(global_t* global);
+bool likear_post(global_t* global);
+bool mostrar_likes(global_t* global, long id_publicacion);
 
 #endif

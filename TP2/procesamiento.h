@@ -3,8 +3,9 @@
 
 #include <stdbool.h>
 #include "hash.h"
+#include "global.h"
 
-typedef bool (*comando_t)(void*, void*);
+typedef bool (*comando_t)(global_t*);
 
 hash_t* iniciar_diccionario();
 void cerrar_diccionario(hash_t* diccionario);
