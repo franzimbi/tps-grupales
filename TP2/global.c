@@ -202,7 +202,7 @@ bool post_publicar(global_t* global, char* texto){
     if(nuevo_post == NULL) return false;
 
     if(!vector_agregar(global->vector_posts, (void*) nuevo_post)){
-        //destructor_publicacion(nuevo_post);
+        destructor_publicacion(nuevo_post);
         return false;
     }
     abb_t* likes_post = abb_crear(strcmp, NULL);
@@ -211,7 +211,6 @@ bool post_publicar(global_t* global, char* texto){
         abb_destruir(likes_post);
         return false;
     }
-
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
         if(usuario_ver_id( (const usuario_t*) (global->login)) == usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)) )
             continue;

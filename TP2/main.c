@@ -23,13 +23,15 @@ int main(int argc, char* argv[]){
     }
     fprintf(stderr, "global creado\n");
     fclose(nombres_usuarios);
-    int largo_linea = 0;
-    size_t largo_nombre = 50;
     char nombre[50];
-    
-    while( ( largo_linea = getline(&nombre, &largo_nombre, stdin) ) != EOF ){
+    while( (fgets(nombre, 50, stdin)) != NULL ){
         fprintf(stderr, "en el while\n");
-        nombre[largo_linea-1] = '\0'; // para no guardar el \n
+        for(size_t i = strlen(nombre); i>0; --i){
+            if(nombre[i] == '\n'){
+                nombre[i] = '\0';
+                break;
+            }
+        }
         comando_t comando = buscar_comando(diccionario, nombre);
         if(comando == NULL){
             fprintf(stderr, "Error: comando inexistente");
