@@ -9,7 +9,7 @@ typedef bool (*comando_t)(global_t*);
 
 hash_t* iniciar_diccionario();
 void cerrar_diccionario(hash_t* diccionario);
-comando_t* buscar_comando(hash_t* diccionario, char* clave);
+comando_t buscar_comando(hash_t* diccionario, char* clave);
 bool string_a_nro(char* str, long* nro);
 
 #endif

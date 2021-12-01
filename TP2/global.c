@@ -202,7 +202,7 @@ bool post_publicar(global_t* global, char* texto){
     if(nuevo_post == NULL) return false;
 
     if(!vector_agregar(global->vector_posts, (void*) nuevo_post)){
-        destructor_publicacion(nuevo_post);
+        //destructor_publicacion(nuevo_post);
         return false;
     }
     abb_t* likes_post = abb_crear(strcmp, NULL);
@@ -228,7 +228,7 @@ bool post_publicar(global_t* global, char* texto){
     return true;
 }
 
-bool siguiente_feed(global_t* global){
+bool ver_siguiente_feed(global_t* global){
     if(feed_esta_al_final(global->login) || global->login == NULL){ 
         fprintf(stderr, "Usuario no loggeado o no hay mas posts para ver.\n");        
         return false;
