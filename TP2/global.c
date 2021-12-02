@@ -200,7 +200,8 @@ bool post_publicar(global_t* global, char* texto){
     if(nuevo_post == NULL) return false;
 
     if(!vector_agregar(global->vector_posts, (void*) nuevo_post)){
-        destructor_publicacion(nuevo_post);
+        //destructor_publicacion(nuevo_post);
+        publicacion_destruir(nuevo_post);
         return false;
     }
     abb_t* likes_post = abb_crear(strcmp, NULL);
@@ -221,6 +222,8 @@ bool post_publicar(global_t* global, char* texto){
             return false;
         }
     }
+    
+    set_id_ultima_publicacion(global->login,publicacion_ver_id(nuevo_post));
     global->id_post_global ++;
     return true;
 }
@@ -233,13 +236,14 @@ bool ver_siguiente_feed(global_t* global){
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
     set_id_ultima_publicacion(global->login, p_prioridad->id_publicacion);
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
-    printf("%s dijo: %s\n", (char*) vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ),
+    printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
     free(p_prioridad);
     return true;
 }
 
 bool likear_post(global_t* global){
+    //printf("ESTO ES ID ULTIMA PUBLICACION %ld\n", ver_id_ultima_publicacion(global->login));
     if(ver_id_ultima_publicacion(global->login) == -1 || global->login == NULL){
         printf("Error: Usuario no loggeado o Post inexistente.\n");
         return false;
@@ -251,7 +255,7 @@ bool likear_post(global_t* global){
 }
 
 bool mostrar_likes(global_t* global, long id_publicacion){
-    if(id_publicacion<=0 || id_publicacion > vector_tamano(global->vector_likes)){
+    if(id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes)){
         printf("Error: Post inexistente o sin likes.\n");
         return false;
     }

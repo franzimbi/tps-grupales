@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
         nombre[strlen(nombre)-1] = '\0'; //borrar el \n
         comando_t comando = buscar_comando(diccionario, nombre);
         if(comando == NULL){
-            printf("Error: comando inexistente");
+            printf("Error: comando inexistente\n");
         }else{
             comando(global);
         }
