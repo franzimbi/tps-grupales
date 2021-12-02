@@ -95,7 +95,7 @@ static post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_
 //--------------------------------------------------------------------------------------------
 
 static bool print_clave(const char* clave, void* _, void* __){
-    printf("%s\n", clave);
+    printf("\t%s\n", clave);
     return true;
 }
 
@@ -255,11 +255,17 @@ bool likear_post(global_t* global){
 }
 
 bool mostrar_likes(global_t* global, long id_publicacion){
-    if(id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes)){
+    if(id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes) ){
         printf("Error: Post inexistente o sin likes.\n");
         return false;
     }
-
-    abb_in_order(vector_obtener(global->vector_likes, id_publicacion), print_clave,NULL);
+    abb_t* post = (abb_t*) vector_obtener(global->vector_likes, id_publicacion);
+    size_t cantidad_likes = abb_cantidad(post);
+    if(cantidad_likes == 0){
+        printf("Error: Post inexistente o sin likes.\n");
+        return true;
+    }
+    printf("El post tiene %zu likes:\n", cantidad_likes);
+    abb_in_order(post, print_clave,NULL);
     return true;
 }
