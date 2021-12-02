@@ -1,4 +1,3 @@
-//#define  _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include "global.h"
@@ -102,12 +101,12 @@ static bool print_clave(const char* clave, void* _, void* __){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
-    int dif = (int) a->prioridad - (int) b->prioridad; 
+    int dif = (int) b->prioridad - (int) a->prioridad; 
     if(dif<-1)
         dif *= -1;
     if(dif != 0) return dif;
     else
-        return (int) a->id_publicacion - (int) b->id_publicacion;
+        return (int) b->id_publicacion - (int) a->id_publicacion;
 }
 
 global_t* global_crear(FILE* f){
@@ -168,12 +167,12 @@ void global_destruir(global_t* global){
 
 bool usuario_login(global_t* global, char* usuario){
     if(global->login != NULL){
-        printf("Error: Ya habia un usuario loggeado.");
+        printf("Error: Ya habia un usuario loggeado.\n");
         return false;
     }
     usuario_t* usr_logeado = hash_obtener(global->hash_usr, usuario);
     if(usr_logeado == NULL){
-        printf("Error: Error: usuario no existente.");
+        printf("Error: Error: usuario no existente.\n");
         return false;
     }
     global->login = usr_logeado;
@@ -200,7 +199,6 @@ bool post_publicar(global_t* global, char* texto){
     if(nuevo_post == NULL) return false;
 
     if(!vector_agregar(global->vector_posts, (void*) nuevo_post)){
-        //destructor_publicacion(nuevo_post);
         publicacion_destruir(nuevo_post);
         return false;
     }
@@ -238,6 +236,7 @@ bool ver_siguiente_feed(global_t* global){
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
+    printf("Likes: %zu\n", abb_cantidad((abb_t*) vector_obtener(global->vector_likes, p_prioridad->id_publicacion)));
     free(p_prioridad);
     return true;
 }
@@ -255,7 +254,7 @@ bool likear_post(global_t* global){
 }
 
 bool mostrar_likes(global_t* global, long id_publicacion){
-    if(id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes) ){
+    if( id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes) ){
         printf("Error: Post inexistente o sin likes.\n");
         return false;
     }
