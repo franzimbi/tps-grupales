@@ -52,5 +52,5 @@ void* usuario_ver_siguiente_publicacion(usuario_t* usuario){
 }
 
 bool feed_esta_al_final(usuario_t* usuario){
-    return heap_ver_max(usuario->feed) == NULL;
+    return usuario == NULL ? false : heap_ver_max(usuario->feed) == NULL;
 }

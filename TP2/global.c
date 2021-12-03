@@ -101,11 +101,13 @@ static bool print_clave(const char* clave, void* _, void* __){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
+    if((int) b->prioridad  == (int) a->prioridad) return (int) b->id_publicacion > (int) a->id_publicacion ? (int) a->id_publicacion * -1 : (int) b->id_publicacion * -1;
+    printf("aca\n\n");
     int dif = (int) b->prioridad - (int) a->prioridad; 
-    if(dif >= -1)
+    if(dif <= -1)
         dif *= -1;
     if(dif != 0) return dif;
-    else
+    else    
         return (int) a->id_publicacion;
 }
 
@@ -228,12 +230,12 @@ bool post_publicar(global_t* global, char* texto){
 
 bool ver_siguiente_feed(global_t* global){
     if(feed_esta_al_final(global->login) || global->login == NULL){ 
-        printf("Usuario no loggeado o no hay mas posts para ver.\n");        
+        printf("Usuario no loggeado o no hay mas posts para ver\n");        
         return false;
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
-    printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
-    printf("Post ID:%zu\n", p_prioridad->id_publicacion);
+    //printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
+    printf("Post ID %zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
     printf("Likes: %zu\n", abb_cantidad((abb_t*) vector_obtener(global->vector_likes, p_prioridad->id_publicacion)));
