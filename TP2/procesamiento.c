@@ -60,10 +60,25 @@ bool mostrar_likes_(global_t* global){
     return mostrar_likes(global, nro);
 }
 
+bool likear_post_(global_t* global){
+    char* id = leer_linea(3);
+    if(id == NULL){
+        printf("Error de memoria\n");
+        return false;
+    }
+    long nro;
+    if( !string_a_nro(id, &nro) ){
+        printf("Error: id invalido\n");
+        free(id);
+        return false;
+    }
+    free(id);
+    return likear_post(global, nro);
+}
 bool help_comandos(global_t* _);
 
 const char* tabla_comandos[] = {"login", "logout", "publicar", "ver_siguiente_feed", "likear_post", "mostrar_likes", "help"};
-comando_t funciones_comandos[] = {login, usuario_logout, publicar, ver_siguiente_feed, likear_post, mostrar_likes_, help_comandos}; 
+comando_t funciones_comandos[] = {login, usuario_logout, publicar, ver_siguiente_feed, likear_post_, mostrar_likes_, help_comandos}; 
 
 bool help_comandos(global_t* _){
     printf("\nCOMANDOS DISPONIBLES:\n\n");

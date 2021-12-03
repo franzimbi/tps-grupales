@@ -220,8 +220,6 @@ bool post_publicar(global_t* global, char* texto){
             return false;
         }
     }
-    
-    set_id_ultima_publicacion(global->login,publicacion_ver_id(nuevo_post));
     global->id_post_global ++;
     printf("Post publicado\n");
     return true;
@@ -234,7 +232,6 @@ bool ver_siguiente_feed(global_t* global){
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
     //printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
-    set_id_ultima_publicacion(global->login, p_prioridad->id_publicacion);
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
@@ -243,14 +240,14 @@ bool ver_siguiente_feed(global_t* global){
     return true;
 }
 
-bool likear_post(global_t* global){
+bool likear_post(global_t* global, long id_post){
     //printf("ESTO ES ID ULTIMA PUBLICACION %ld\n", ver_id_ultima_publicacion(global->login));
-    if(ver_id_ultima_publicacion(global->login) == -1 || global->login == NULL){
+    if(global->login == NULL || id_post <0 || id_post > vector_tamano(global->vector_posts)){
         printf("Error: Usuario no loggeado o Post inexistente\n");
         return false;
     }
 
-    abb_guardar((abb_t *) vector_obtener(global->vector_likes,ver_id_ultima_publicacion(global->login)), usuario_ver_nombre(global->login),NULL);
+    abb_guardar((abb_t *) vector_obtener(global->vector_likes, (size_t) id_post), usuario_ver_nombre(global->login),NULL);
     printf("Post likeado\n");
     return true;
 }
