@@ -106,7 +106,7 @@ int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
         dif *= -1;
     if(dif != 0) return dif;
     else
-        return (int) b->id_publicacion - (int) a->id_publicacion;
+        return (int) a->id_publicacion;
 }
 
 global_t* global_crear(FILE* f){
@@ -211,6 +211,7 @@ bool post_publicar(global_t* global, char* texto){
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
         if(usuario_ver_id( (const usuario_t*) (global->login)) == usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)) )
             continue;
+        //printf("esto es el usuario creador %ld\n\n  y lector %ld\n\n",usuario_ver_id(global->login), usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)));
         post_con_prioridad_t* p_prioridad = post_con_prioridad_crear(publicacion_ver_id(nuevo_post), usuario_ver_id(global->login),
                                             usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)));
         // VALIDAR 
@@ -231,7 +232,7 @@ bool ver_siguiente_feed(global_t* global){
         return false;
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
-    //printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
+    printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
