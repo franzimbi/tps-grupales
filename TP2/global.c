@@ -25,7 +25,7 @@ struct global{
 
 struct post_con_prioridad{
     size_t id_publicacion;
-    long prioridad;
+    size_t prioridad;
 };
 
 //- - - - - - - - - - - - -  - - - - VECTOR DINAMICO - - - - - - - - - - - - - - - - - - - - 
@@ -83,7 +83,7 @@ static post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_
     if(p_prioridad == NULL) return NULL;
     
     long dif_id = id_creador - id_lector;
-    if(dif_id > 0)
+    if(dif_id < 0)
         dif_id *= -1;
     
     p_prioridad->id_publicacion = id_post;
@@ -101,12 +101,10 @@ static bool print_clave(const char* clave, void* _, void* __){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
-    int dif = (int) b->prioridad - (int) a->prioridad; 
-    if(dif >= -1)
-        dif *= -1;
-    if(dif != 0) return dif;
-    else
-        return (int) a->id_publicacion;
+    if(b->prioridad == a->prioridad)
+        return (int) b->id_publicacion - (int) a->id_publicacion;
+    
+    return (int) b->prioridad - (int) a->prioridad; 
 }
 
 global_t* global_crear(FILE* f){
@@ -211,7 +209,6 @@ bool post_publicar(global_t* global, char* texto){
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
         if(usuario_ver_id( (const usuario_t*) (global->login)) == usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)) )
             continue;
-        //printf("esto es el usuario creador %ld\n\n  y lector %ld\n\n",usuario_ver_id(global->login), usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)));
         post_con_prioridad_t* p_prioridad = post_con_prioridad_crear(publicacion_ver_id(nuevo_post), usuario_ver_id(global->login),
                                             usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)));
         // VALIDAR 
@@ -232,7 +229,6 @@ bool ver_siguiente_feed(global_t* global){
         return false;
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
-    printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
@@ -242,7 +238,7 @@ bool ver_siguiente_feed(global_t* global){
 }
 
 bool likear_post(global_t* global, long id_post){
-    //printf("ESTO ES ID ULTIMA PUBLICACION %ld\n", ver_id_ultima_publicacion(global->login));
+    
     if(global->login == NULL || id_post <0 || id_post > vector_tamano(global->vector_posts)){
         printf("Error: Usuario no loggeado o Post inexistente\n");
         return false;
