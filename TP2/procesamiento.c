@@ -34,7 +34,7 @@ bool login(global_t* global){
 }
 
 bool publicar(global_t* global){
-    char* texto = leer_linea(70);
+    char* texto = leer_linea(200);
     if(texto == NULL){
         printf("Error de memoria\n");
         return false;
