@@ -25,7 +25,7 @@ struct global{
 
 struct post_con_prioridad{
     size_t id_publicacion;
-    size_t prioridad;
+    long prioridad;
 };
 
 //- - - - - - - - - - - - -  - - - - VECTOR DINAMICO - - - - - - - - - - - - - - - - - - - - 
@@ -83,11 +83,11 @@ static post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_
     if(p_prioridad == NULL) return NULL;
     
     long dif_id = id_creador - id_lector;
-    if(dif_id < 0)
+    if(dif_id > 0)
         dif_id *= -1;
     
     p_prioridad->id_publicacion = id_post;
-    p_prioridad->prioridad = (size_t) dif_id;
+    p_prioridad->prioridad = /*(size_t)*/ dif_id;
     return p_prioridad;
 }
 
@@ -102,7 +102,7 @@ static bool print_clave(const char* clave, void* _, void* __){
 
 int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
     int dif = (int) b->prioridad - (int) a->prioridad; 
-    if(dif<-1)
+    if(dif >= -1)
         dif *= -1;
     if(dif != 0) return dif;
     else
@@ -232,6 +232,7 @@ bool ver_siguiente_feed(global_t* global){
         return false;
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
+    printf("ESTO ES LA PRIORIDAD EN TEORIA %ld\n",p_prioridad->prioridad);
     set_id_ultima_publicacion(global->login, p_prioridad->id_publicacion);
     printf("Post ID:%zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
