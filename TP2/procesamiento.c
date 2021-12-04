@@ -9,7 +9,7 @@ static char* leer_linea(size_t n){
 
     char* texto = malloc(sizeof(char) * n); 
     if(texto == NULL) return NULL;
-    fgets(texto, (int) n, stdin);
+    if(fgets(texto, (int) n, stdin) == NULL) return NULL;
     size_t len = strlen(texto);
     if(len < n)
     texto[len-1] = '\0';
@@ -87,7 +87,7 @@ hash_t* iniciar_diccionario(){
     if(diccionario == NULL) return NULL;
 
     for(size_t i=0; i<CANTIDAD_COMANDOS; i++){
-        if(!hash_guardar(diccionario, (char*) tabla_comandos[i], (void*) funciones_comandos[i]))
+        if(!hash_guardar(diccionario, (char*) tabla_comandos[i], *(void**) (&funciones_comandos[i])))
             hash_destruir(diccionario);
     }
     return diccionario;
@@ -98,5 +98,6 @@ void cerrar_diccionario(hash_t* diccionario){
 }
 
 comando_t buscar_comando(hash_t* diccionario, char* clave){
-    return (comando_t) hash_obtener(diccionario, clave);
+    void* comando = hash_obtener(diccionario, clave);
+    return  **(comando_t*) &comando;
 }

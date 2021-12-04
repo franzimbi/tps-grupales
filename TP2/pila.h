@@ -1,5 +1,5 @@
-#ifndef _PILA_H
-#define _PILA_H
+#ifndef PILA_H
+#define PILA_H
 
 #include <stdbool.h>
 
