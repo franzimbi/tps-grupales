@@ -10,16 +10,18 @@ static char* leer_linea(size_t n){
     char* texto = malloc(sizeof(char) * n); 
     if(texto == NULL) return NULL;
     fgets(texto, (int) n, stdin);
-    texto[strlen(texto)-1] = '\0';
+    size_t len = strlen(texto);
+    if(len < n)
+    texto[len-1] = '\0';
     return texto;
 }
 
-bool string_a_nro(char* str, long* nro){
+long string_a_nro(char* str){
     char* ptr;
-    *nro = strtol(str, &ptr, 10);
+    long nro = strtol(str, &ptr, 10);
     if( (*ptr) != '\0')
-        return false;
-    return true;
+        return -1;
+    return nro;
 }
 
 bool login(global_t* global){
@@ -45,33 +47,23 @@ bool publicar(global_t* global){
 }
 
 bool mostrar_likes_(global_t* global){
-    char* id = leer_linea(3);
+    char* id = leer_linea(10);
     if(id == NULL){
         printf("Error de memoria\n");
         return false;
     }
-    long nro;
-    if( !string_a_nro(id, &nro) ){
-        printf("Error: id invalido\n");
-        free(id);
-        return false;
-    }
+    long nro = string_a_nro(id);
     free(id);
     return mostrar_likes(global, nro);
 }
 
 bool likear_post_(global_t* global){
-    char* id = leer_linea(3);
+    char* id = leer_linea(10);
     if(id == NULL){
         printf("Error de memoria\n");
         return false;
     }
-    long nro;
-    if( !string_a_nro(id, &nro) ){
-        printf("Error: id invalido\n");
-        free(id);
-        return false;
-    }
+    long nro = string_a_nro(id);
     free(id);
     likear_post(global, nro);
     return true;

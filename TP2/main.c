@@ -20,10 +20,10 @@ int main(int argc, char* argv[]){
         return EXIT_FAILURE;
     }
     fclose(nombres_usuarios);
-    char nombre[50];
-    while( (fgets(nombre, 50, stdin)) != NULL ){
-        nombre[strlen(nombre)-1] = '\0'; //borrar el \n
-        comando_t comando = buscar_comando(diccionario, nombre);
+    char buffer[50];
+    while( (fgets(buffer, 50, stdin)) != NULL ){
+        buffer[strlen(buffer)-1] = '\0'; //borrar el \n
+        comando_t comando = buscar_comando(diccionario, buffer);
         if(comando == NULL){
             printf("Error: comando inexistente\n");
         }else{
