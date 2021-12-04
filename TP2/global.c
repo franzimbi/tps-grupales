@@ -238,7 +238,7 @@ bool ver_siguiente_feed(global_t* global){
 }
 
 bool likear_post(global_t* global, long id_post){
-    if(global->login == NULL || id_post <0 || id_post > global->id_post_global){
+    if(global->login == NULL || id_post <0 || id_post >= global->id_post_global){
         printf("Error: Usuario no loggeado o Post inexistente\n");
         return false;
     }
@@ -248,12 +248,12 @@ bool likear_post(global_t* global, long id_post){
     return true;
 }
 
-bool mostrar_likes(global_t* global, long id_publicacion){
-    if( id_publicacion<0 || id_publicacion > vector_tamano(global->vector_likes) ){
+bool mostrar_likes(global_t* global, long id_post){
+    if( id_post<0 || id_post >= global->id_post_global ){
         printf("Error: Post inexistente o sin likes\n");
         return false;
     }
-    abb_t* post = (abb_t*) vector_obtener(global->vector_likes, id_publicacion);
+    abb_t* post = (abb_t*) vector_obtener(global->vector_likes, id_post);
     size_t cantidad_likes = abb_cantidad(post);
     if(cantidad_likes == 0){
         printf("Error: Post inexistente o sin likes\n");
