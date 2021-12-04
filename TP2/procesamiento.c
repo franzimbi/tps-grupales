@@ -73,7 +73,8 @@ bool likear_post_(global_t* global){
         return false;
     }
     free(id);
-    return likear_post(global, nro);
+    likear_post(global, nro);
+    return true;
 }
 bool help_comandos(global_t* _);
 

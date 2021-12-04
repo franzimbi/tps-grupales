@@ -229,6 +229,7 @@ bool ver_siguiente_feed(global_t* global){
         return false;
     }
     post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
+    printf("Post ID %zu\n", p_prioridad->id_publicacion);
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
     printf("Likes: %zu\n", abb_cantidad((abb_t*) vector_obtener(global->vector_likes, p_prioridad->id_publicacion)));
@@ -237,8 +238,7 @@ bool ver_siguiente_feed(global_t* global){
 }
 
 bool likear_post(global_t* global, long id_post){
-    
-    if(global->login == NULL || id_post <0 || id_post > vector_tamano(global->vector_posts)){
+    if(global->login == NULL || id_post <0 || id_post > global->id_post_global){
         printf("Error: Usuario no loggeado o Post inexistente\n");
         return false;
     }

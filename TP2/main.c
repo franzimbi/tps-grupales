@@ -8,7 +8,6 @@ int main(int argc, char* argv[]){
 
     hash_t* diccionario = iniciar_diccionario();
     if(diccionario == NULL) return EXIT_FAILURE;
-    //fprintf(stderr, "diccionario creado\n");
     FILE* nombres_usuarios = fopen(argv[1], "r");
     if(nombres_usuarios == NULL){
         cerrar_diccionario(diccionario);
@@ -20,7 +19,6 @@ int main(int argc, char* argv[]){
         fclose(nombres_usuarios);
         return EXIT_FAILURE;
     }
-    //fprintf(stderr, "global\n");
     fclose(nombres_usuarios);
     char nombre[50];
     while( (fgets(nombre, 50, stdin)) != NULL ){

@@ -5,6 +5,7 @@
 
 #define TAMANO_INICIAL 20
 #define CONSTANTE_REDIMENSION_DESENCOLAR 4
+#define CONSTANTE_CAMBIO_TAMANO 2
 
 struct heap{
     void** datos;
@@ -19,11 +20,11 @@ static void swap(void** arr, size_t p1, size_t p2){
     arr[p2]= aux;
 }
 
-static size_t minimo(void** arr, cmp_func_t cmp, size_t padre, size_t hijo_izq, size_t hijo_der){
-    size_t minimo = padre;
-    if(cmp(arr[minimo], arr[hijo_izq]) < 0)
-        minimo = hijo_izq;
-    return cmp(arr[minimo], arr[hijo_der]) < 0 ? hijo_der : minimo;
+static size_t maximo(void** arr, cmp_func_t cmp, size_t padre, size_t hijo_izq, size_t hijo_der){
+    size_t maximo = padre;
+    if(cmp(arr[maximo], arr[hijo_izq]) < 0)
+        maximo = hijo_izq;
+    return cmp(arr[maximo], arr[hijo_der]) < 0 ? hijo_der : maximo;
 }
 
 static void upheap(void** arr, size_t hijo, cmp_func_t cmp){
@@ -42,7 +43,7 @@ static size_t hijo_valido(void** arr, size_t cant, size_t hijo_der, size_t hijo_
         if(cmp(arr[padre],arr[hijo_izq]) <= 0 )return hijo_izq;
         else return padre;
 
-    } else return minimo(arr, cmp, padre, hijo_izq, hijo_der); 
+    } else return maximo(arr, cmp, padre, hijo_izq, hijo_der); 
 }
 static void downheap(void** arr, size_t cant, size_t padre, cmp_func_t cmp){
     if(padre == cant) return;
@@ -53,11 +54,11 @@ static void downheap(void** arr, size_t cant, size_t padre, cmp_func_t cmp){
 
     if(hijo_izq>=cant) return;
 
-    size_t min = hijo_valido(arr,cant,hijo_der,hijo_izq,padre, cmp);
+    size_t max = hijo_valido(arr,cant,hijo_der,hijo_izq,padre, cmp);
     
-    if(min != padre){
-        swap(arr, padre, min);
-        downheap(arr, cant, min, cmp);
+    if(max != padre){
+        swap(arr, padre, max);
+        downheap(arr, cant, max, cmp);
     }
 }
 
@@ -79,11 +80,9 @@ static void heapify(void** arr, size_t n, cmp_func_t cmp){
 
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
     heapify(elementos, cant, cmp);
-    size_t tamano = 0;
-    while(tamano<cant){
+    for(size_t tamano = 0; tamano < cant ;tamano++){
         swap(elementos, 0, cant - tamano - 1);
         downheap(elementos, cant - tamano - 1, 0, cmp);
-        tamano++;
     }
 }
 
@@ -121,10 +120,10 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 }
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *)){
-    while(!heap_esta_vacio(heap)){
-        void* dato = heap_desencolar(heap);
-        if(destruir_elemento != NULL)
-            destruir_elemento(dato);
+    if(destruir_elemento != NULL){
+        while(!heap_esta_vacio(heap)){
+            destruir_elemento(heap_desencolar(heap));
+        }
     }
     free(heap->datos);
     free(heap);
@@ -140,7 +139,7 @@ bool heap_esta_vacio(const heap_t *heap){
 
 bool heap_encolar(heap_t *heap, void *elem){
     if(heap->tam == heap->cant)
-        if(!heap_redimensionar(heap, heap->tam * 2)) return false;
+        if(!heap_redimensionar(heap, heap->tam * CONSTANTE_CAMBIO_TAMANO)) return false;
     heap->datos[heap->cant] = elem;
     upheap(heap->datos, heap->cant, heap->cmp);
     heap->cant ++;
@@ -154,10 +153,10 @@ void *heap_ver_max(const heap_t *heap){
 void *heap_desencolar(heap_t *heap){
     if(heap_esta_vacio(heap)) return NULL;
     if(heap->cant * CONSTANTE_REDIMENSION_DESENCOLAR <= heap->tam && heap->tam > TAMANO_INICIAL){
-        if(heap->tam /2 <= TAMANO_INICIAL){
+        if(heap->tam / CONSTANTE_CAMBIO_TAMANO <= TAMANO_INICIAL){
             heap_redimensionar(heap, TAMANO_INICIAL);
         }else{
-            heap_redimensionar(heap, heap->tam/2 );
+            heap_redimensionar(heap, heap->tam/CONSTANTE_CAMBIO_TAMANO );
         }
     }
 
