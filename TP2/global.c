@@ -116,8 +116,8 @@ global_t* global_crear(FILE* f){
         free(nuevo);
         return NULL;
     }
-    char nombre [50];
-    while(  (fgets(nombre, 50, f)) != NULL ){
+    char nombre [10000];
+    while(  (fgets(nombre, 10000, f)) != NULL ){
         nombre[strlen(nombre)-1] = '\0'; //borrar el \n
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), (int (*)(const void*, const void*)) publicacion_cmp);
         if(nuevo_usuario == NULL){
