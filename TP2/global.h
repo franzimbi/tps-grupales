@@ -27,8 +27,12 @@ bool usuario_logout(global_t* global);
 //pre: global fue creada
 bool post_publicar(global_t* global, char* texto);
 
+
 bool ver_siguiente_feed(global_t* global);
 bool likear_post(global_t* global, long id_post);
 bool mostrar_likes(global_t* global, long id_publicacion);
+
+// - - -- - - - - - - - - - - -
+char* leer_linea(FILE* f);
 
 #endif

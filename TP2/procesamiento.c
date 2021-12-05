@@ -4,38 +4,8 @@
 #include <stdlib.h>
 
 #define CANTIDAD_COMANDOS 7
-#define CANTIDAD_INICIAL 100
 
-char* leer_linea(){
-
-    char* texto = malloc(sizeof(char)*CANTIDAD_INICIAL);
-    if(texto == NULL) return NULL;
-    
-    size_t counter = 0;
-    size_t n = CANTIDAD_INICIAL;
-    char caracter;
-    while((caracter = (char) fgetc(stdin)) != '\n' && caracter != EOF ){
-        
-        if(counter == n - 1){
-            n *= 2;
-            char* aux = realloc(texto,sizeof(char) * n);
-            if(aux == NULL) return NULL;
-            texto = aux;
-        }
-
-        texto[counter] = caracter;
-        counter++;
-    }
-    if(caracter == EOF){
-        return NULL;
-    }
-
-    texto[counter] = '\0';
-    return texto;        
-
-}
-
-long string_a_nro(char* str){
+static long string_a_nro(char* str){
     char* ptr;
     long nro = strtol(str, &ptr, 10);
     if( (*ptr) != '\0')
@@ -44,7 +14,7 @@ long string_a_nro(char* str){
 }
 
 bool login(global_t* global){
-    char* nombre = leer_linea();
+    char* nombre = leer_linea(stdin);
     if(nombre == NULL){
         printf("Error de memoria\n");
         return false;
@@ -55,7 +25,7 @@ bool login(global_t* global){
 }
 
 bool publicar(global_t* global){
-    char* texto = leer_linea();
+    char* texto = leer_linea(stdin);
     if(texto == NULL){
         printf("Error de memoria\n");
         return false;
@@ -66,7 +36,7 @@ bool publicar(global_t* global){
 }
 
 bool mostrar_likes_(global_t* global){
-    char* id = leer_linea();
+    char* id = leer_linea(stdin);
     if(id == NULL){
         printf("Error de memoria\n");
         return false;
@@ -77,7 +47,7 @@ bool mostrar_likes_(global_t* global){
 }
 
 bool likear_post_(global_t* global){
-    char* id = leer_linea();
+    char* id = leer_linea(stdin);
     if(id == NULL){
         printf("Error de memoria\n");
         return false;

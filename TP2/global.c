@@ -107,6 +107,30 @@ int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
     return (int) b->prioridad - (int) a->prioridad; 
 }
 
+char* leer_linea(FILE* f){
+    char* texto = malloc(sizeof(char) * CANTIDAD_INICIAL);
+    if(texto == NULL) return NULL;
+    size_t counter = 0;
+    size_t n = CANTIDAD_INICIAL;
+    char caracter;
+    while((caracter = (char) fgetc(f)) != '\n' && caracter != EOF ){
+        if(counter == n - 1){
+            n *= 2;
+            char* aux = realloc(texto, sizeof(char) * n);
+            if(aux == NULL) return NULL;
+            texto = aux;
+        }
+        texto[counter] = caracter;
+        counter++;
+    }
+    if(caracter == EOF){
+        free(texto);
+        return NULL;
+    }
+    texto[counter] = '\0';
+    return texto;        
+}
+
 global_t* global_crear(FILE* f){
     global_t* nuevo = malloc(sizeof(global_t));
     if(nuevo == NULL) return NULL;
@@ -116,9 +140,8 @@ global_t* global_crear(FILE* f){
         free(nuevo);
         return NULL;
     }
-    char nombre [10000];
-    while(  (fgets(nombre, 10000, f)) != NULL ){
-        nombre[strlen(nombre)-1] = '\0'; //borrar el \n
+    char* nombre;
+    while(  (nombre = leer_linea(f)) != NULL ){
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), (int (*)(const void*, const void*)) publicacion_cmp);
         if(nuevo_usuario == NULL){
             vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
@@ -130,6 +153,7 @@ global_t* global_crear(FILE* f){
             free(nuevo);
             return NULL;
         }
+        free(nombre);
     }
     nuevo->hash_usr = hash_crear(NULL);
     for (size_t i = 0; i < vector_tamano(nuevo->vector_usr); i++){
