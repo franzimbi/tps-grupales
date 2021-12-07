@@ -1,18 +1,12 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include "global.h"
+#include "vector.h"
 #include "hash.h"
 #include "usuarios.h"
 #include "post.h"
 #include "abb.h"
 
 #define CANTIDAD_INICIAL 30
-
-struct vector{
-    void** datos;
-    size_t tamano;
-    size_t capacidad;
-};
 
 struct global{
     vector_t* vector_usr;
@@ -23,74 +17,6 @@ struct global{
     usuario_t* login;
 };
 
-struct post_con_prioridad{
-    size_t id_publicacion;
-    size_t prioridad;
-};
-
-//- - - - - - - - - - - - -  - - - - VECTOR DINAMICO - - - - - - - - - - - - - - - - - - - - 
-static vector_t* vector_crear(size_t tam){
-    vector_t* nuevo = malloc(sizeof(vector_t));
-    if(nuevo == NULL) return NULL;
-    nuevo->datos = malloc(sizeof(void*) * tam);
-    if(nuevo->datos == NULL){
-        free(nuevo);
-        return NULL;
-    }
-    nuevo->tamano = 0;
-    nuevo->capacidad = tam;
-    return nuevo;
-}
-
-void vector_destruir(vector_t* vector, void (*destruir_dato)(void *)){
-    for(size_t i=0; i<vector->tamano; i++){
-        if(destruir_dato == NULL)
-            break;
-        destruir_dato(vector->datos[i]);
-    }
-    free(vector->datos);
-    free(vector);
-}
-
-static bool vector_redimensionar(vector_t* vector, size_t nuevo_tamano){
-    void** aux = realloc(vector->datos, sizeof(void*) * nuevo_tamano);
-    if(aux == NULL){
-        return false;
-    }
-    vector->datos = aux;
-    vector->capacidad = nuevo_tamano;
-    return true;
-}
-
-static bool vector_agregar(vector_t* vector, void* dato){
-    if(vector->tamano == vector->capacidad)
-        if(!vector_redimensionar(vector, (vector->tamano)*2)) return false;
-    vector->datos[vector->tamano] = dato;
-    vector->tamano ++;
-    return true;
-}
-
-static size_t vector_tamano(vector_t* vector){
-    return vector->tamano;
-}
-
-static void* vector_obtener(vector_t* vector, size_t pos){
-    return vector->datos[pos];
-}
-
-static post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector){
-    post_con_prioridad_t* p_prioridad = malloc(sizeof (post_con_prioridad_t));
-    if(p_prioridad == NULL) return NULL;
-    
-    long dif_id = id_creador - id_lector;
-    if(dif_id < 0)
-        dif_id *= -1;
-    
-    p_prioridad->id_publicacion = id_post;
-    p_prioridad->prioridad = /*(size_t)*/ dif_id;
-    return p_prioridad;
-}
-
 //--------------------------------------------------------------------------------------------
 
 static bool print_clave(const char* clave, void* _, void* __){
@@ -99,13 +25,6 @@ static bool print_clave(const char* clave, void* _, void* __){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
-    if(b->prioridad == a->prioridad)
-        return (int) b->id_publicacion - (int) a->id_publicacion;
-    
-    return (int) b->prioridad - (int) a->prioridad; 
-}
 
 char* leer_linea(FILE* f){
     char* texto = malloc(sizeof(char) * CANTIDAD_INICIAL);
@@ -142,7 +61,7 @@ global_t* global_crear(FILE* f){
     }
     char* nombre;
     while(  (nombre = leer_linea(f)) != NULL ){
-        usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr), (int (*)(const void*, const void*)) publicacion_cmp);
+        usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr));
         if(nuevo_usuario == NULL){
             vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
             free(nuevo);

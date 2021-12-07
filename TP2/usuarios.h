@@ -6,13 +6,22 @@
 #include "heap.h"
 
 
+// - - - - - - - - - - - - - - - - - - - structura auxiliar para guardar posts en cada feed- - - - - - - - - - - - - 
+typedef struct{
+    size_t id_publicacion;
+    size_t prioridad;
+}post_con_prioridad_t;
+
+
+post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 typedef struct usuario usuario_t;
 typedef void (*destructor_usuario)(usuario_t*);
-//typedef int (*cmp_func_t)(const void *a, const void *b);
 
 //recibe el nombre del nuevo usuario, su id y la funcion de comparacion de las publicaciones.
 //devuelve el usuario o NULL si fallo.
-usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones);
+usuario_t* usuario_crear(char* nombre, size_t id);
 
 //destruye el usuario, pero no las publicaciones.
 //pre: el usuario fue creado

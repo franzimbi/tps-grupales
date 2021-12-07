@@ -1,5 +1,4 @@
 #include "usuarios.h"
-//#include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +9,27 @@ struct usuario{
     heap_t* feed;
 };
 
-usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
+static int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
+    if(b->prioridad == a->prioridad)
+        return (int) b->id_publicacion - (int) a->id_publicacion;
+    
+    return (int) b->prioridad - (int) a->prioridad; 
+}
+
+post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector){
+    post_con_prioridad_t* p_prioridad = malloc(sizeof (post_con_prioridad_t));
+    if(p_prioridad == NULL) return NULL;
+    
+    long dif_id = id_creador - id_lector;
+    if(dif_id < 0)
+        dif_id *= -1;
+    
+    p_prioridad->id_publicacion = id_post;
+    p_prioridad->prioridad =  dif_id;
+    return p_prioridad;
+}
+
+usuario_t* usuario_crear(char* nombre, size_t id){
     usuario_t* nuevo = malloc(sizeof(usuario_t));
     if(nuevo == NULL) return NULL;
     nuevo->nombre = malloc(sizeof(char) * (strlen(nombre) + 1));
@@ -20,7 +39,7 @@ usuario_t* usuario_crear(char* nombre, size_t id, cmp_func_t cmp_publicaciones){
     }
     strcpy(nuevo->nombre, nombre);
     nuevo->id = id;
-    nuevo->feed = heap_crear(cmp_publicaciones);
+    nuevo->feed = heap_crear( (int (*)(const void *, const void *)) publicacion_cmp);
     if(nuevo->feed == NULL){
         free(nuevo->nombre);
         free(nuevo);

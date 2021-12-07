@@ -4,9 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef struct vector vector_t;
 typedef struct global global_t;
-typedef struct post_con_prioridad post_con_prioridad_t;
 
 //crea una estructura global a partir de un archivo abierto con todos los nombres de usuario.
 //post: devuelve un puntero a la estructura o NULL si fallo/
