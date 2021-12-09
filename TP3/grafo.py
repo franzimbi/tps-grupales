@@ -3,9 +3,11 @@
 class Grafo:
 
     """ inicializa un grafo  en blanco"""
-    def __init__(self):
+    def __init__(self, dirigido=False, pesado=False):
         self._vertices = {}
         self._datos = {}
+        self._dirigido = dirigido
+        self._pesado = pesado
     
     """devulve una lista de todas las aristas del vertice"""
     def aristas(self, vertice):
