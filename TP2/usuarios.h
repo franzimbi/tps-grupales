@@ -37,11 +37,11 @@ char* usuario_ver_nombre(const usuario_t* usuario);
 
 //se guarda en el feed del usuario la publicacion y devuelve true. si falla devuelve false.
 //pre: el usuario y la publicacion fue creado
-bool usuario_guardar_publicacion(usuario_t* usuario, void* publicacion);
+bool usuario_guardar_publicacion(usuario_t* usuario, publicacion_t* publicacion, size_t id_creador);
 
 //se devuelve la siguiente publicacion con mayor prioridad o NULL si no hay mas publicaciones para ver.
 //pre: el usuario fue creado
-void* usuario_ver_siguiente_publicacion(usuario_t* usuario);
+size_t usuario_ver_siguiente_publicacion(usuario_t* usuario);
 
 //devuelve ture si el feed no tiene mas publicaciones
 //pre: el usuario fue creado

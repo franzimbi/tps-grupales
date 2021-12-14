@@ -62,12 +62,16 @@ char* usuario_ver_nombre(const usuario_t* usuario){
     return usuario->nombre;
 }
 
-bool usuario_guardar_publicacion(usuario_t* usuario, void* publicacion){
-    return heap_encolar(usuario->feed, publicacion);
+bool usuario_guardar_publicacion(usuario_t* usuario, publicacion_t* publicacion, size_t id_creador){
+    post_con_prioridad_t* p_prioridad = post_con_prioridad_crear(publicacion_ver_id(publicacion), id_creador, usuario_ver_id(usuario));
+    return heap_encolar(usuario->feed, p_prioridad);
 }
 
-void* usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
-    return heap_desencolar(usuario->feed);
+size_t usuario_ver_siguiente_publicacion(usuario_t* usuario){ 
+    post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) heap_desencolar(usuario->feed);
+    size_t id = p_prioridad->id_publicacion;
+    free(p_prioridad);
+    return id;
 }
 
 bool feed_esta_al_final(usuario_t* usuario){

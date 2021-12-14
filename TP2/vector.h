@@ -5,7 +5,7 @@
 
 typedef struct vector vector_t;
 
-vector_t* vector_crear(size_t tam);
+vector_t* vector_crear();
 void vector_destruir(vector_t* vector, void (*destruir_dato)(void *));
 bool vector_agregar(vector_t* vector, void* dato);
 size_t vector_tamano(vector_t* vector);

@@ -54,7 +54,7 @@ global_t* global_crear(FILE* f){
     global_t* nuevo = malloc(sizeof(global_t));
     if(nuevo == NULL) return NULL;
 
-    nuevo->vector_usr = vector_crear(CANTIDAD_INICIAL);
+    nuevo->vector_usr = vector_crear();
     if(nuevo->vector_usr == NULL){
         free(nuevo);
         return NULL;
@@ -78,14 +78,14 @@ global_t* global_crear(FILE* f){
     for (size_t i = 0; i < vector_tamano(nuevo->vector_usr); i++){
         hash_guardar(nuevo->hash_usr,usuario_ver_nombre(vector_obtener(nuevo->vector_usr, i)), vector_obtener(nuevo->vector_usr, i));
     }
-    nuevo->vector_posts = vector_crear(CANTIDAD_INICIAL);
+    nuevo->vector_posts = vector_crear();
     if(nuevo->vector_posts == NULL){
         vector_destruir(nuevo->vector_usr, (void (*) (void*)) usuario_destruir);
         hash_borrar(nuevo->hash_usr, NULL);
         free(nuevo);
         return NULL;
     }
-    nuevo->vector_likes = vector_crear(CANTIDAD_INICIAL);
+    nuevo->vector_likes = vector_crear();
     if(nuevo->vector_posts == NULL){
         vector_destruir(nuevo->vector_usr, (void (*) (void*)) usuario_destruir);
         hash_borrar(nuevo->hash_usr, NULL);
@@ -106,35 +106,35 @@ void global_destruir(global_t* global){
     free(global);
 }
 
-bool usuario_login(global_t* global, char* usuario){
-    if(global->login != NULL){
-        printf("Error: Ya habia un usuario loggeado\n");
-        return false;
+static bool usuario_logeado(global_t* global){
+    return global->login != NULL;
+}
+
+status_t usuario_login(global_t* global, char* usuario){
+    if(!usuario_logeado(global)){
+        return USUARIO_YA_LOGEADO;
     }
     usuario_t* usr_logeado = hash_obtener(global->hash_usr, usuario);
     if(usr_logeado == NULL){
-        printf("Error: usuario no existente\n");
-        return false;
+        return USUARIO_INEXISTENTE;
     }
     global->login = usr_logeado;
     printf("Hola %s\n", usuario_ver_nombre(usr_logeado));
-    return true;
+    return TODO_OK;
 }
 
-bool usuario_logout(global_t* global){
+status_t usuario_logout(global_t* global){
     if(global->login == NULL){
-        printf("Error: no habia usuario loggeado\n");
-        return false;
+        return USUARIO_NO_LOGEADO;
     }    
     global->login = NULL;
     printf("Adios\n");
-    return true;
+    return TODO_OK;
 }
 
-bool post_publicar(global_t* global, char* texto){
-    if(global->login == NULL){
-        printf("Error: no habia usuario loggeado\n");
-        return false;
+status_t post_publicar(global_t* global, char* texto){
+    if(!usuario_logeado(global)){
+        return USUARIO_YA_LOGEADO;
     }
     publicacion_t* nuevo_post = publicacion_nueva(global->id_post_global, texto, usuario_ver_id(global->login));
     if(nuevo_post == NULL) return false;
@@ -151,11 +151,8 @@ bool post_publicar(global_t* global, char* texto){
     }
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
         if(usuario_ver_id( (const usuario_t*) (global->login)) == usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)) )
-            continue;
-        post_con_prioridad_t* p_prioridad = post_con_prioridad_crear(publicacion_ver_id(nuevo_post), usuario_ver_id(global->login),
-                                            usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)));
-        // VALIDAR 
-        if( !usuario_guardar_publicacion(vector_obtener(global->vector_usr, i), (void*) p_prioridad) ){
+            continue; 
+        if( !usuario_guardar_publicacion(vector_obtener(global->vector_usr, i), nuevo_post, usuario_ver_id(global->login)) ){
             publicacion_destruir(nuevo_post);
             abb_destruir(likes_post);
             return false;
@@ -163,24 +160,22 @@ bool post_publicar(global_t* global, char* texto){
     }
     global->id_post_global ++;
     printf("Post publicado\n");
-    return true;
+    return TODO_OK;
 }
 
-bool ver_siguiente_feed(global_t* global){
+status_t ver_siguiente_feed(global_t* global){
     if(feed_esta_al_final(global->login) || global->login == NULL){ 
-        printf("Usuario no loggeado o no hay mas posts para ver\n");        
-        return false;
+        return FEED_VACIO;
     }
-    post_con_prioridad_t* p_prioridad = (post_con_prioridad_t*) usuario_ver_siguiente_publicacion(global->login);
-    printf("Post ID %zu\n", p_prioridad->id_publicacion);
-    printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) ) ),
-                                    publicacion_ver_mensaje( vector_obtener(global->vector_posts, p_prioridad->id_publicacion) ) );
-    printf("Likes: %zu\n", abb_cantidad((abb_t*) vector_obtener(global->vector_likes, p_prioridad->id_publicacion)));
-    free(p_prioridad);
+    size_t id_post = usuario_ver_siguiente_publicacion(global->login);
+    printf("Post ID %zu\n", id_post);
+    printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, id_post) ) ) ),
+                                    publicacion_ver_mensaje( vector_obtener(global->vector_posts, id_post) ) );
+    printf("Likes: %zu\n", abb_cantidad((abb_t*) vector_obtener(global->vector_likes, id_post)));
     return true;
 }
 
-bool likear_post(global_t* global, long id_post){
+status_t likear_post(global_t* global, long id_post){
     if(global->login == NULL || id_post <0 || id_post >= global->id_post_global){
         printf("Error: Usuario no loggeado o Post inexistente\n");
         return false;
@@ -191,7 +186,7 @@ bool likear_post(global_t* global, long id_post){
     return true;
 }
 
-bool mostrar_likes(global_t* global, long id_post){
+status_t mostrar_likes(global_t* global, long id_post){
     if( id_post<0 || id_post >= global->id_post_global ){
         printf("Error: Post inexistente o sin likes\n");
         return false;

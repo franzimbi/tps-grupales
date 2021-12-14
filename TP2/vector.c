@@ -8,16 +8,18 @@ struct vector{
     size_t capacidad;
 };
 
-vector_t* vector_crear(size_t tam){
+#define CANTIDAD_INICIAL 30
+
+vector_t* vector_crear(){
     vector_t* nuevo = malloc(sizeof(vector_t));
     if(nuevo == NULL) return NULL;
-    nuevo->datos = malloc(sizeof(void*) * tam);
+    nuevo->datos = malloc(sizeof(void*) * CANTIDAD_INICIAL);
     if(nuevo->datos == NULL){
         free(nuevo);
         return NULL;
     }
     nuevo->tamano = 0;
-    nuevo->capacidad = tam;
+    nuevo->capacidad = CANTIDAD_INICIAL;
     return nuevo;
 }
 
