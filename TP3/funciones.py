@@ -61,22 +61,62 @@ def camino_mas_corto(grafo, origen, destino):
     (padres, orden) = bfs(grafo, origen)
     return reconstruir_camino(padres, destino)
 
-def diametro(grafo):
+def _ciclo(grafo, origen, orden, contador):
+    orden.append(origen)
+    print("guarde:" + origen + '\t' + "contador: " + str(contador) + "\t" + orden[0] + " == " + origen)
+    contador-= 1
+    if contador == 1 and orden[0] in grafo.adyacentes(origen):
+        return True
+    for v in grafo.adyacentes(origen):
+        if len(grafo.adyacentes(v)) == 0:
+            continue
+        if v not in orden:
+            if _ciclo(grafo, v, orden, contador):
+                return True
+    orden.remove(origen)
+    contador =+ 1
+    return False
+
+
+def ciclo(grafo, origen, n):
+    orden = []
+    orden.append(origen)
+    contador = n
+    if _ciclo(grafo, origen, orden, contador):
+        return orden
+    return orden
+
+def navegacion(grafo, origen):
+    contador = 0
+    orden = []
+    while contador<20:
+        orden.append(origen)
+        origen = grafo.adyacentes(origen)[0]
+        contador +=1
+    return orden
+
+def rango(grafo, pagina, n):
     
 
-
-internet = grafo.Grafo()
+internet = grafo.Grafo(True)
 
 internet.insertar_arista('a', 'b')
 internet.insertar_arista('a', 'c')
 internet.insertar_arista('c', 'd')
-internet.insertar_arista('e', 'g')
-internet.insertar_arista('g', 'h')
-internet.insertar_arista('i', 'b')
-internet.insertar_arista('f', 'g')
+internet.insertar_arista('c', 'e')
 internet.insertar_arista('b', 'f')
-internet.insertar_arista('d', 'e')
+internet.insertar_arista('b', 'g')
+internet.insertar_arista('d', 'i')
+internet.insertar_arista('e', 'h')
+internet.insertar_arista('f', 'h')
+internet.insertar_arista('g', 'j')
+internet.insertar_arista('i', 'k')
+internet.insertar_arista('k', 'h')
+internet.insertar_arista('j', 'k')
+internet.insertar_arista('j', 'h')
+internet.insertar_arista('h', 'a')
+
 
 print(internet)
 
-print(camino_mas_corto(internet, 'a', 'i'))
+print(navegacion(internet, 'a'))
