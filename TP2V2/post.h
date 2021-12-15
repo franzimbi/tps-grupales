@@ -2,6 +2,7 @@
 #define POST_H
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct publicacion publicacion_t;
 typedef void (*destructor_publicacion)(publicacion_t*);
@@ -24,7 +25,7 @@ size_t likes_publicacion(const publicacion_t* publicacion);
 
 void likear_publicacion(const publicacion_t* publicacion, char* usuario);
 
-void printear_likes(const publicacion_t* publicacion, void* funcion);
+void printear_likes(const publicacion_t* publicacion, bool funcion (const char*,void*,void*));
 
 //desturye la publicacion
 //pre: la publacion fue creada

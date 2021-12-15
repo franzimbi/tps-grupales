@@ -27,8 +27,6 @@ static bool print_clave(const char* clave, void* _, void* __){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-
 global_t* global_crear(FILE* f){
     global_t* nuevo = malloc(sizeof(global_t));
     if(nuevo == NULL) return NULL;
@@ -80,7 +78,6 @@ global_t* global_crear(FILE* f){
 void global_destruir(global_t* global){
     vector_destruir(global->vector_usr, (void (*) (void*)) usuario_destruir);
     vector_destruir(global->vector_posts, (void (*) (void*)) publicacion_destruir);
-    //vector_destruir(global->vector_likes, (void (*) (void*)) abb_destruir);
     hash_destruir(global->hash_usr);
     free(global);
 }
@@ -116,26 +113,19 @@ status_t post_publicar(global_t* global, char* texto){
         return USUARIO_YA_LOGEADO;
     }
     publicacion_t* nuevo_post = publicacion_nueva(global->id_post_global, texto, usuario_ver_id(global->login));
-    if(nuevo_post == NULL) return false;
+    if(nuevo_post == NULL) return ERROR_MEMORIA;
 
     if(!vector_agregar(global->vector_posts, (void*) nuevo_post)){
         publicacion_destruir(nuevo_post);
-        return false;
+        return ERROR_MEMORIA;
     }
-    // abb_t* likes_post = abb_crear(strcmp, NULL);
-    // if(!vector_agregar(global->vector_likes, (void*) likes_post)){
-        // publicacion_destruir(nuevo_post);
-        // abb_destruir(likes_post);
-        // return false;
-    // }
 
     for(size_t i=0; i<vector_tamano(global->vector_usr); i++){
         if(usuario_ver_id( (const usuario_t*) (global->login)) == usuario_ver_id( (const usuario_t*) vector_obtener(global->vector_usr, i)) )
             continue; 
         if( !usuario_guardar_publicacion(vector_obtener(global->vector_usr, i), nuevo_post, usuario_ver_id(global->login)) ){
             publicacion_destruir(nuevo_post);
-            //abb_destruir(likes_post);
-            return false;
+            return ERROR_MEMORIA;
         }
     }
     global->id_post_global ++;
@@ -152,31 +142,28 @@ status_t ver_siguiente_feed(global_t* global){
     printf("%s dijo: %s\n", usuario_ver_nombre(vector_obtener(global->vector_usr, publicacion_ver_id_creador( vector_obtener(global->vector_posts, id_post) ) ) ),
                                     publicacion_ver_mensaje( vector_obtener(global->vector_posts, id_post) ) );
     printf("Likes: %zu\n", likes_publicacion(vector_obtener(global->vector_posts, id_post)));
-    return true;
+    return TODO_OK;
 }
 
 status_t likear_post(global_t* global, long id_post){
-    if(global->login == NULL || id_post <0 || id_post >= global->id_post_global){
-        printf("Error: Usuario no loggeado o Post inexistente\n");
-        return false;
+    if(!usuario_logeado(global) || id_post <0 || id_post >= global->id_post_global){
+        return USUARIO_NO_LOGEADO;
     }
 
     likear_publicacion(vector_obtener(global->vector_posts, id_post), usuario_ver_nombre(global->login));
     printf("Post likeado\n");
-    return true;
+    return TODO_OK;
 }
 
 status_t mostrar_likes(global_t* global, long id_post){
     if( id_post<0 || id_post >= global->id_post_global ){
-        printf("Error: Post inexistente o sin likes\n");
-        return false;
+        return POST_SIN_LIKES_O_INEXISTENTE;
     }
     size_t cantidad_likes = likes_publicacion(vector_obtener(global->vector_posts, id_post));
     if(cantidad_likes == 0){
-        printf("Error: Post inexistente o sin likes\n");
-        return true;
+        return POST_SIN_LIKES_O_INEXISTENTE;
     }
     printf("El post tiene %zu likes:\n", cantidad_likes);
     printear_likes(vector_obtener(global->vector_posts, id_post), print_clave);
-    return true;
+    return TODO_OK;
 }

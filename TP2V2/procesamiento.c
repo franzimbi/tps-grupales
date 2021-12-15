@@ -6,6 +6,16 @@
 #define CANTIDAD_COMANDOS 7
 #define CANT_INI 200
 
+
+static char* tabla_error[] = {  "todo ok", 
+                                "Error: Ya habia un usuario loggeado\n", 
+                                "Error: usuario no existente\n",
+                                "Error: no habia usuario loggeado\n",
+                                "Usuario no loggeado o no hay mas posts para ver\n", 
+                                "Error: Usuario no loggeado o Post inexistente\n", 
+                                "Error: Post inexistente o sin likes\n"
+                                };
+
 char* leer_linea(FILE* f){
     char* texto = malloc(sizeof(char) * CANT_INI);
     if(texto == NULL) return NULL;
@@ -38,61 +48,67 @@ static long string_a_nro(char* str){
     return nro;
 }
 
-status_t login(global_t* global){
+static void imprimir_error(status_t status){
+    if(status != TODO_OK)
+        printf("%s", tabla_error[status]);
+}
+
+void login(global_t* global){
     char* nombre = leer_linea(stdin);
     if(nombre == NULL){
         printf("Error de memoria\n");
-        return false;
     }
-    status_t status = usuario_login(global, nombre);
+    imprimir_error(usuario_login(global, nombre));
     free(nombre);
-    return status;
 }
 
-status_t publicar(global_t* global){
+void logout(global_t* global){
+    imprimir_error(usuario_logout(global));
+}
+
+void publicar(global_t* global){
     char* texto = leer_linea(stdin);
     if(texto == NULL){
         printf("Error de memoria\n");
-        return false;
     }
-    status_t status = post_publicar(global, texto);
+    imprimir_error(post_publicar(global, texto));
     free(texto);
-    return status;
 }
 
-status_t mostrar_likes_(global_t* global){
+void siguiente(global_t* global){
+    imprimir_error(ver_siguiente_feed(global));
+}
+
+void mostrar_likes_(global_t* global){
     char* id = leer_linea(stdin);
     if(id == NULL){
         printf("Error de memoria\n");
-        return false;
     }
     long nro = string_a_nro(id);
     free(id);
-    return mostrar_likes(global, nro);
+    imprimir_error(mostrar_likes(global, nro));
 }
 
-status_t likear_post_(global_t* global){
+void likear_post_(global_t* global){
     char* id = leer_linea(stdin);
     if(id == NULL){
         printf("Error de memoria\n");
-        return false;
     }
     long nro = string_a_nro(id);
     free(id);
-    return likear_post(global, nro);;
+    imprimir_error(likear_post(global, nro));
 }
-status_t help_comandos(global_t* _);
+void help_comandos(global_t* _);
 
 const char* tabla_comandos[] = {"login", "logout", "publicar", "ver_siguiente_feed", "likear_post", "mostrar_likes", "help"};
-comando_t funciones_comandos[] = {login, usuario_logout, publicar, ver_siguiente_feed, likear_post_, mostrar_likes_, help_comandos}; 
+comando_t funciones_comandos[] = {login, logout, publicar, siguiente, likear_post_, mostrar_likes_, help_comandos}; 
 
-status_t help_comandos(global_t* _){
+void help_comandos(global_t* _){
     printf("\nCOMANDOS DISPONIBLES:\n\n");
     for(size_t i=0; i<CANTIDAD_COMANDOS-1; i++){
     printf("%s\n", tabla_comandos[i]);
     }
     printf("\n");
-    return TODO_OK;
 }
 
 hash_t* iniciar_diccionario(){

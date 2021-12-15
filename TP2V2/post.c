@@ -25,7 +25,11 @@ publicacion_t* publicacion_nueva(size_t id, char* texto, size_t id_creador){
     }
 
     publicacion->likes = abb_crear(strcmp, NULL);
-    if(publicacion->likes == NULL) return NULL;
+    if(publicacion->likes == NULL){
+        free(publicacion->mensaje);
+        free(publicacion);
+        return NULL;
+    }
 
     return publicacion;
 }
@@ -50,8 +54,8 @@ void likear_publicacion(const publicacion_t* publicacion, char* usuario){
     abb_guardar(publicacion->likes,usuario,NULL);
 }
 
-void printear_likes(const publicacion_t* publicacion, void* funcion){
-    abb_in_order(publicacion->likes,((bool) (*)(const char*,void*,void*)) funcion,NULL);
+void printear_likes(const publicacion_t* publicacion, bool funcion (const char*,void*,void*)){
+    abb_in_order(publicacion->likes, funcion, NULL);
 }
 
 void publicacion_destruir(publicacion_t* publicacion){
