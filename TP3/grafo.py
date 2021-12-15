@@ -1,101 +1,85 @@
 #!/usr/bin/python3
+import random
 
 class Grafo:
-
-    """ inicializa un grafo  en blanco"""
-    def __init__(self, dirigido=False, pesado=False):
+    def __init__(self, dirigido=False):
+        self._dirigido = dirigido
         self._vertices = {}
         self._datos = {}
-        self._dirigido = dirigido
-        self._pesado = pesado
-    
-    """devulve una lista de todas las aristas del vertice"""
-    def aristas(self, vertice):
-        return self._vertices[vertice]
 
-    """devuelve todos los vertices del grafo en un set"""
-    def todos_los_vertices(self):
-        return self._datos
+    """inserta un vertice. si ese vertice existe, reemplaza el dato"""
+    def insertar_vertice(self, vertice, dato=None):
+        if vertice is not self._vertices:
+            self._vertices[vertice] = {}
+        self._datos[vertice] = dato
 
-    """devuelve una lista de las aristas del grafo"""
-    def todas_las_aristas(self):
-        aristas =[]
-        for origen in self._vertices:
-            for destino in self._vertices[origen]:
-                aristas.append([origen,destino])
-        return aristas
-
-    """devuelve un set con la copia de todos los adyacentes del vertice"""
-    def adyacentes_vertice(self, vertice):
-        if vertice in self._vertices:
-            return self._vertices[vertice].copy()
-    
-    """agrega el vertice al grafo"""
-    def agregar_vertice(self, vertice, dato=None):
-        if vertice not in self._vertices:
-            self._vertices[vertice] = set()
-            self._datos[vertice] = dato
-
-    """saca el vertice del grafo y devuelve el dato que almacenaba"""
-    def sacar_vertice(self, vertice):
-        aux = self._datos[vertice]
-        self._datos.pop(vertice)
-        self._vertices.pop(vertice)
-        return aux
-
-    """agrega la arista al grafo"""
-    def agregar_arista(self, origen, destino):
+    """inserta una arista con peso. en caso de no ser pesado no insertar peso. en caso de no ser dirigido, origen y destino son indistintos"""
+    def insertar_arista(self, origen, destino, peso=None):
         if origen not in self._vertices:
-            self.agregar_vertice(origen)
-            self.agregar_vertice(destino)
-        self._vertices[origen].add(destino)
+            self._vertices[origen] = {}
+        if destino not in self._vertices:
+            self._vertices[destino] = {}
+        self._vertices[origen][destino] = peso
+        if self._dirigido == False:
+            self._vertices[destino][origen] = peso
+        return True
 
-    """saca la arista del grafo"""
+    """devuelve una lista con los vertices adyacentes"""
+    def adyacentes(self, vertice):
+        if vertice in self._vertices:
+            return list(self._vertices[vertice].keys())
+        return None
+
+    """saca un vertice y devuelve su dato"""
+    def sacar_vertice(self, vertice):
+        for i in self._vertices:
+            self._vertices[i].pop(vertice)
+        self._vertices.pop(vertice)
+        return self._datos.pop(vertice)
+
+    """saca una arista"""
     def sacar_arista(self, origen, destino):
+        self._vertices[origen].pop(destino)
+        if self._dirigido == False:
+            self._vertices[destino].pop(origen)
+
+    """devuelve True si dos vertices estan unidos por una arista. False en caso contrario"""
+    def ver_dos_vertices_unidos(self, origen, destino):
         if origen in self._vertices:
-            self._vertices[origen].discard(destino)
-    
-    def existe_arista(self, origen, destino):
-        if origen in self._vertices:
-            if destino in self._vertices[origen]:
-                return True
+            return destino in self._vertices[origen]
         return False
 
-    """devuelve el dato de la clave"""
-    def dato(self, clave):
-        return self._datos[clave]
+    """devuelve True si un vertice existe. False en caso contrario"""
+    def existe_vertice(self, vertice):
+        return vertice in self._vertices
+    
+    """devuelve el dato del vertice"""
+    def dato_vertice(self, vertice):
+        if vertice in self._vertices:
+            return self._datos[vertice]
+        return None
 
-    """devuelte true o false si el vertice existe"""
-    def existe_vertice(self, clave):
-        if clave in self._datos:
-            return True
-        else:
-            return False
+    """devuelve una lista con todos los vertices"""
+    def todos_vertices(self):
+        return list(self._vertices.keys())
+
+    """devuelve un vertice aleatorio"""
+    def vertice_aleatorio(self):
+        return random.choice(list(self._vertices)) 
+
+    def __iter__(self):
+        return iter(self._vertices.keys())
 
     def __str__(self):
-        aux = ''
-        for origen in self._vertices:
-            aux += origen + '-->'
-            if len(self._vertices[origen]) != 0:
-                aux += str(self._vertices[origen].copy()) + '\n'
+        res = ''
+        for i in self._vertices:
+            res+= str(i) + '-->'
+            if(len(self._vertices[i]) != 0):
+                res += str(self._vertices[i].copy()) + '\n'
             else:
-                aux += '\n'
-        return aux
+                res += '\n'
+        return res
 
 
-grafo = Grafo()
 
-grafo.agregar_vertice('a')
-grafo.agregar_vertice('b', 2)
-grafo.agregar_vertice('c', 3)
-grafo.agregar_vertice('d', 4)
-grafo.agregar_vertice('e', 5)
-grafo.agregar_vertice('e', 6)
-grafo.agregar_arista('a', 'b')
-grafo.agregar_arista('a', 'c')
-grafo.agregar_arista('a', 'd')
-grafo.agregar_arista('b', 'a')
-grafo.agregar_arista('b', 'c')
 
-print(grafo.adyacentes_vertice('a'))
-print(grafo)
