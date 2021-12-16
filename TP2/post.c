@@ -1,11 +1,13 @@
 #include "post.h"
 #include <stdio.h>
 #include <string.h>
+#include "abb.h"
 
 struct publicacion{
     size_t id;
     char* mensaje;
     size_t id_creador;
+    abb_t* likes;
 };
 
 publicacion_t* publicacion_nueva(size_t id, char* texto, size_t id_creador){
@@ -21,6 +23,14 @@ publicacion_t* publicacion_nueva(size_t id, char* texto, size_t id_creador){
         free(publicacion);
         return NULL;
     }
+
+    publicacion->likes = abb_crear(strcmp, NULL);
+    if(publicacion->likes == NULL){
+        free(publicacion->mensaje);
+        free(publicacion);
+        return NULL;
+    }
+
     return publicacion;
 }
 
@@ -36,7 +46,20 @@ size_t publicacion_ver_id_creador(const publicacion_t* publicacion){
     return publicacion->id_creador;
 }
 
+size_t likes_publicacion(const publicacion_t* publicacion){
+    return abb_cantidad(publicacion->likes);
+}
+
+void likear_publicacion(const publicacion_t* publicacion, char* usuario){
+    abb_guardar(publicacion->likes,usuario,NULL);
+}
+
+void printear_likes(const publicacion_t* publicacion, bool funcion (const char*,void*,void*)){
+    abb_in_order(publicacion->likes, funcion, NULL);
+}
+
 void publicacion_destruir(publicacion_t* publicacion){
     free(publicacion->mensaje);
+    abb_destruir(publicacion->likes);
     free(publicacion);
 }
