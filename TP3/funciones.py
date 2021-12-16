@@ -61,30 +61,21 @@ def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
     (padres, orden) = bfs(grafo, origen)
     return reconstruir_camino(padres, destino)
 
-def _ciclo(grafo, origen, orden, contador, fin):
-    if contador == 1 and origen == fin:
+def _ciclo(grafo, origen, orden, n):
+    if len(orden) == n and origen in orden:
         return True
+    if len(orden) == n or origen in orden:
+        return False
     orden.append(origen)
-    print("guarde:" + origen + '\t' + "contador: " + str(contador) + "\t" + orden[0] + " == " + origen)
-    print("\t" + orden)
-    contador-= 1
-    
     for v in grafo.adyacentes(origen):
-        if len(grafo.adyacentes(v)) == 0:
-            continue
-        if v not in orden:
-            if _ciclo(grafo, v, orden, contador, fin):
+            if _ciclo(grafo, v, orden, n):
                 return True
     orden.remove(origen)
-    contador =+ 1
     return False
 
-
-def ciclo(grafo, origen, n): # 3 ESTRELLAS: ???
+def ciclo(grafo, origen, n): # 3 ESTRELLAS: ANDA
     orden = []
-    orden.append(origen)
-    contador = n
-    if _ciclo(grafo, origen, orden, contador, origen):
+    if _ciclo(grafo, origen, orden, n):
         return orden
     return orden
 
@@ -136,4 +127,4 @@ internet.insertar_arista('h', 'a')
 
 print(internet)
 
-print(diametro(internet))
+print(ciclo(internet, 'a', 4))
