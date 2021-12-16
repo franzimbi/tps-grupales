@@ -6,14 +6,6 @@
 #include "heap.h"
 
 
-// - - - - - - - - - - - - - - - - - - - structura auxiliar para guardar posts en cada feed- - - - - - - - - - - - - 
-typedef struct{
-    size_t id_publicacion;
-    size_t prioridad;
-}post_con_prioridad_t;
-
-
-post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector);
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 typedef struct usuario usuario_t;

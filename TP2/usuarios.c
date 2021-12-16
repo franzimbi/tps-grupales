@@ -9,6 +9,11 @@ struct usuario{
     heap_t* feed;
 };
 
+typedef struct{
+    size_t id_publicacion;
+    size_t prioridad;
+}post_con_prioridad_t;
+
 static int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
     if(b->prioridad == a->prioridad)
         return (int) b->id_publicacion - (int) a->id_publicacion;
@@ -16,7 +21,7 @@ static int publicacion_cmp(post_con_prioridad_t* a, post_con_prioridad_t* b){
     return (int) b->prioridad - (int) a->prioridad; 
 }
 
-post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector){
+static post_con_prioridad_t* post_con_prioridad_crear(size_t id_post, size_t id_creador, size_t id_lector){
     post_con_prioridad_t* p_prioridad = malloc(sizeof (post_con_prioridad_t));
     if(p_prioridad == NULL) return NULL;
     
