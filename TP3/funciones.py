@@ -57,36 +57,38 @@ def reconstruir_camino(padres, destino):
         destino = padres[destino]
     return recorrido[::-1]
 
-def camino_mas_corto(grafo, origen, destino):
+def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
     (padres, orden) = bfs(grafo, origen)
     return reconstruir_camino(padres, destino)
 
-def _ciclo(grafo, origen, orden, contador):
+def _ciclo(grafo, origen, orden, contador, fin):
+    if contador == 1 and origen == fin:
+        return True
     orden.append(origen)
     print("guarde:" + origen + '\t' + "contador: " + str(contador) + "\t" + orden[0] + " == " + origen)
+    print("\t" + orden)
     contador-= 1
-    if contador == 1 and orden[0] in grafo.adyacentes(origen):
-        return True
+    
     for v in grafo.adyacentes(origen):
         if len(grafo.adyacentes(v)) == 0:
             continue
         if v not in orden:
-            if _ciclo(grafo, v, orden, contador):
+            if _ciclo(grafo, v, orden, contador, fin):
                 return True
     orden.remove(origen)
     contador =+ 1
     return False
 
 
-def ciclo(grafo, origen, n):
+def ciclo(grafo, origen, n): # 3 ESTRELLAS: ???
     orden = []
     orden.append(origen)
     contador = n
-    if _ciclo(grafo, origen, orden, contador):
+    if _ciclo(grafo, origen, orden, contador, origen):
         return orden
     return orden
 
-def navegacion(grafo, origen):
+def navegacion(grafo, origen): # 1 ESTRELLA: ANDA
     contador = 0
     orden = []
     while contador<20:
@@ -95,8 +97,23 @@ def navegacion(grafo, origen):
         contador +=1
     return orden
 
-def rango(grafo, pagina, n):
-    
+def rango(grafo, pagina, n): # 1 ESTRELLA: ANDA
+    (padres, orden) = bfs(grafo, pagina)
+    paginas_rango = []
+    for w in orden:
+        if orden.get(w) == n:
+            paginas_rango.append(w)
+    return paginas_rango
+
+def diametro(grafo): # 1 ESTRELLA: ANDA
+    max_min_dist = 0
+    for v in grafo:
+        (padres, orden) = bfs(grafo, v)
+        for w in orden:
+            if orden[w] > max_min_dist:
+                max_min_dist = orden[w]
+    return max_min_dist
+
 
 internet = grafo.Grafo(True)
 
@@ -119,4 +136,4 @@ internet.insertar_arista('h', 'a')
 
 print(internet)
 
-print(navegacion(internet, 'a'))
+print(diametro(internet))
