@@ -104,27 +104,3 @@ def diametro(grafo): # 1 ESTRELLA: ANDA
             if orden[w] > max_min_dist:
                 max_min_dist = orden[w]
     return max_min_dist
-
-
-internet = grafo.Grafo(True)
-
-internet.insertar_arista('a', 'b')
-internet.insertar_arista('a', 'c')
-internet.insertar_arista('c', 'd')
-internet.insertar_arista('c', 'e')
-internet.insertar_arista('b', 'f')
-internet.insertar_arista('b', 'g')
-internet.insertar_arista('d', 'i')
-internet.insertar_arista('e', 'h')
-internet.insertar_arista('f', 'h')
-internet.insertar_arista('g', 'j')
-internet.insertar_arista('i', 'k')
-internet.insertar_arista('k', 'h')
-internet.insertar_arista('j', 'k')
-internet.insertar_arista('j', 'h')
-internet.insertar_arista('h', 'a')
-
-
-print(internet)
-
-print(ciclo(internet, 'a', 4))
