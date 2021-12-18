@@ -59,8 +59,10 @@ def reconstruir_camino(padres, destino):
 
 def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
     (padres, orden) = bfs(grafo, origen)
-    recorrido = reconstruir_camino(padres, destino)
-    return recorrido, len(recorrido) -1
+    if destino in padres:
+        recorrido = reconstruir_camino(padres, destino)
+        return recorrido, len(recorrido) -1
+    return None, None
 
 def _ciclo(grafo, actual, orden, n):
     if len(orden) == n and actual in orden:
@@ -77,9 +79,8 @@ def _ciclo(grafo, actual, orden, n):
 def ciclo(grafo, origen, n): # 3 ESTRELLAS: ANDA
     orden = []
     if _ciclo(grafo, origen, orden, n):
-        orden.append(origen)
         return orden
-    return orden
+    return None
 
 def navegacion(grafo, origen): # 1 ESTRELLA: ANDA
     contador = 0
@@ -112,6 +113,7 @@ def diametro(grafo): # 1 ESTRELLA: ANDA
     return max_min_dist
 
 orden_contador = 0
+orden = {}
 
 def min(a,b):
     if a < b:
@@ -143,13 +145,12 @@ def conectados_(grafo, v, visitados, apilados, orden, mb, pila):
             cfc.append(w)
             if w == v:
                 break
-        orden_contador = 0
         return cfc
 
-def conectados(grafo, pagina):
-    visitados = set()
+def conectados(grafo, pagina): # 2 ESTRELLAS: FUNCIONA
     apilados = set()
-    orden = {}
+    visitados = set()
     mb = {}
     pila = deque()
     return conectados_(grafo, pagina, visitados, apilados, orden, mb, pila)
+
