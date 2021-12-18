@@ -59,32 +59,37 @@ def reconstruir_camino(padres, destino):
 
 def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
     (padres, orden) = bfs(grafo, origen)
-    return reconstruir_camino(padres, destino)
+    recorrido = reconstruir_camino(padres, destino)
+    return recorrido, len(recorrido) -1
 
-def _ciclo(grafo, origen, orden, n):
-    if len(orden) == n and origen in orden:
+def _ciclo(grafo, actual, orden, n):
+    if len(orden) == n and actual in orden:
         return True
-    if len(orden) == n or origen in orden:
+    if len(orden) == n or actual in orden:
         return False
-    orden.append(origen)
-    for v in grafo.adyacentes(origen):
+    orden.append(actual)
+    for v in grafo.adyacentes(actual):
             if _ciclo(grafo, v, orden, n):
                 return True
-    orden.remove(origen)
+    orden.remove(actual)
     return False
 
 def ciclo(grafo, origen, n): # 3 ESTRELLAS: ANDA
     orden = []
     if _ciclo(grafo, origen, orden, n):
+        orden.append(origen)
         return orden
     return orden
 
 def navegacion(grafo, origen): # 1 ESTRELLA: ANDA
     contador = 0
     orden = []
-    while contador<20:
+    while contador<=20:
         orden.append(origen)
-        origen = grafo.adyacentes(origen)[0]
+        if(len(grafo.adyacentes(origen)) > 0):
+            origen = grafo.adyacentes(origen)[0]
+        else:
+            break
         contador +=1
     return orden
 
@@ -94,13 +99,57 @@ def rango(grafo, pagina, n): # 1 ESTRELLA: ANDA
     for w in orden:
         if orden.get(w) == n:
             paginas_rango.append(w)
-    return paginas_rango
+    return len(paginas_rango)
 
 def diametro(grafo): # 1 ESTRELLA: ANDA
     max_min_dist = 0
+    orden_max = []
     for v in grafo:
         (padres, orden) = bfs(grafo, v)
         for w in orden:
             if orden[w] > max_min_dist:
                 max_min_dist = orden[w]
     return max_min_dist
+
+orden_contador = 0
+
+def min(a,b):
+    if a < b:
+        return a
+    else:
+        return b
+
+def conectados_(grafo, v, visitados, apilados, orden, mb, pila):
+    global orden_contador
+
+    visitados.add(v)
+    orden[v] = orden_contador
+    mb[v] = orden[v]
+    orden_contador +=1
+    pila.appendleft(v)
+    apilados.add(v)
+
+    for w in grafo.adyacentes(v):
+        if w not in visitados:
+            conectados_(grafo, w, visitados, apilados, orden, mb, pila)
+        if w in apilados:
+            if mb[v] > mb[w]:
+                mb[v] = min(mb[v], mb[w])
+    if orden[v] == mb[v] and len(pila) > 0:
+        cfc = []
+        while True:
+            w = pila.popleft()
+            apilados.remove(w)
+            cfc.append(w)
+            if w == v:
+                break
+        orden_contador = 0
+        return cfc
+
+def conectados(grafo, pagina):
+    visitados = set()
+    apilados = set()
+    orden = {}
+    mb = {}
+    pila = deque()
+    return conectados_(grafo, pagina, visitados, apilados, orden, mb, pila)

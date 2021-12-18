@@ -25,7 +25,15 @@ def crear_red(tsv):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         sys.exit(1)
-    else:
-        print("ok")
+
+    tsv = leer_parser(sys.argv[1])
+    red = crear_red(tsv)
+
+    sys.setrecursionlimit(75000)
+    #print(sys.getrecursionlimit())
+
+    print(funciones.conectados(red, "Boca Juniors"))
+    print(funciones.conectados(red, "Boca Juniors"))
+
 
 
