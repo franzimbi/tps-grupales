@@ -1,3 +1,4 @@
+#include "file_reader.h"
 #include "procesamiento.h"
 #include <string.h>
 #include <stdio.h>
@@ -16,30 +17,6 @@ static char* tabla_error[] = {  "\0",
                                 "Error: Post inexistente o sin likes\n"
                                 }; 
 
-
-char* leer_linea(FILE* f){
-    char* texto = malloc(sizeof(char) * CANT_INI);
-    if(texto == NULL) return NULL;
-    size_t counter = 0;
-    size_t n = CANT_INI;
-    char caracter;
-    while((caracter = (char) fgetc(f)) != '\n' && caracter != EOF ){
-        if(counter == n - 1){
-            n *= 2;
-            char* aux = realloc(texto, sizeof(char) * n);
-            if(aux == NULL) return NULL;
-            texto = aux;
-        }
-        texto[counter] = caracter;
-        counter++;
-    }
-    if(caracter == EOF){
-        free(texto);
-        return NULL;
-    }
-    texto[counter] = '\0';
-    return texto;        
-}
 
 static long string_a_nro(char* str){
     char* ptr;

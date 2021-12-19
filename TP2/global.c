@@ -27,7 +27,7 @@ static bool print_clave(const char* clave, void* _, void* __){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-global_t* global_crear(FILE* f){
+global_t* global_crear(users_function user){
     global_t* nuevo = malloc(sizeof(global_t));
     if(nuevo == NULL) return NULL;
 
@@ -37,7 +37,7 @@ global_t* global_crear(FILE* f){
         return NULL;
     }
     char* nombre;
-    while(  (nombre = leer_linea(f)) != NULL ){
+    while(  (nombre = user) != NULL ){
         usuario_t* nuevo_usuario = usuario_crear(nombre, vector_tamano(nuevo->vector_usr));
         if(nuevo_usuario == NULL){
             vector_destruir (nuevo->vector_usr, (void (*) (void *)) usuario_destruir);
