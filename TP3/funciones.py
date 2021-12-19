@@ -132,6 +132,7 @@ def conectados_(grafo, v, visitados, apilados, orden, mb, pila):
     apilados.add(v)
 
     for w in grafo.adyacentes(v):
+        #print(w)
         if w not in visitados:
             conectados_(grafo, w, visitados, apilados, orden, mb, pila)
         if w in apilados:
@@ -147,7 +148,7 @@ def conectados_(grafo, v, visitados, apilados, orden, mb, pila):
                 break
         return cfc
 
-def conectados(grafo, pagina): # 2 ESTRELLAS: FUNCIONA
+def conectados(grafo, pagina): # 2 ESTRELLAS: no anda
     apilados = set()
     visitados = set()
     mb = {}
