@@ -68,9 +68,10 @@ if __name__ == "__main__":
 #                       1                   2                       3               1               1           
     dicc_comandos = {"camino": camino, "conectados": conectados,"ciclo": ciclo, "rango": rango, "navegacion": navegacion, "listar_operaciones": listar}
 
+
     for line in sys.stdin: #lee linea
         line = line.replace('\n', '') #elimina los \n
-        palabras = line.split(', ') #separa las palabras
+        palabras = line.split(',') #separa las palabras
         aux = palabras[0].split(' ')
         palabras.pop(0)
         funcion = aux.pop(0)

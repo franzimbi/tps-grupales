@@ -58,6 +58,8 @@ def reconstruir_camino(padres, destino):
     return recorrido[::-1]
 
 def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
+    if origen not in grafo:
+        return None, None
     (padres, orden) = bfs(grafo, origen)
     if destino in padres:
         recorrido = reconstruir_camino(padres, destino)
@@ -65,9 +67,10 @@ def camino_mas_corto(grafo, origen, destino): # 1 ESTRELLA: ANDA
     return None, None
 
 def _ciclo(grafo, actual, orden, n):
-    if len(orden) == n and actual in orden:
+    if len(orden) == n-1 and orden[0] == actual:
+        orden.append(actual)
         return True
-    if len(orden) == n or actual in orden:
+    if len(orden) == n-1 or actual in orden:
         return False
     orden.append(actual)
     for v in grafo.adyacentes(actual):
@@ -77,8 +80,10 @@ def _ciclo(grafo, actual, orden, n):
     return False
 
 def ciclo(grafo, origen, n): # 3 ESTRELLAS: ANDA
+    if origen not in grafo:
+        return None
     orden = []
-    if _ciclo(grafo, origen, orden, n):
+    if _ciclo(grafo, origen, orden, n+1):
         return orden
     return None
 
