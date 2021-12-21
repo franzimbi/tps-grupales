@@ -14,11 +14,11 @@ typedef enum {TODO_OK,
                 POST_SIN_LIKES_O_INEXISTENTE,
                 ERROR_MEMORIA} status_t;
 
-typedef char* (users_function);
+typedef char* (*users_function) (FILE* f);
 
-//crea una estructura global a partir de un archivo abierto con todos los nombres de usuario.
-//post: devuelve un puntero a la estructura o NULL si fallo/
-global_t* global_crear(users_function function);
+//crea la estructura global a partir de los nombres de usuario q va devolviendo lectura_usuarios cada vez q se la llama.
+//corta las lecturas cuando funtion devuelve NULL
+global_t* global_crear(users_function lectura_usuarios, FILE* f);
 
 //destruye global y todos sus datos
 void global_destruir(global_t* global);

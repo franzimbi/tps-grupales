@@ -1,5 +1,5 @@
 #include "procesamiento.h"
-#include "file_reader.h"
+//#include "file_reader.h"
 #include "global.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]){
         cerrar_diccionario(diccionario);
         return EXIT_FAILURE;
     }
-    global_t* global = global_crear(leer_linea(nombres_usuarios));
+    global_t* global = global_crear(leer_linea, nombres_usuarios);
     if(global == NULL){
         cerrar_diccionario(diccionario);
         fclose(nombres_usuarios);

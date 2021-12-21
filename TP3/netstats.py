@@ -38,15 +38,15 @@ def conectados(grafo, parametros): #funciona
     sys.setrecursionlimit(5000)
 
 def ciclo(grafo, parametros): #funciona
-    orden = funciones.ciclo(grafo, parametros[0], int(parametros[1]))
-    if orden == None:
-        print("No se encontro recorrido.")
+    n = int(parametros[1])
+    if n > len(grafo) or n <= 0:
+        print("No se encontro recorrido")
         return
-    res = ""
-    for i in range(0,len(orden)-1):
-        res += orden[i] + " -> "
-    res += parametros[0]
-    print(res)
+    orden = funciones.ciclo(grafo, parametros[0], n)
+    if orden == None:
+        print("No se encontro recorrido")
+        return
+    print(" -> ".join(orden))
 
 def rango(grafo, parametros): #funciona
     print(funciones.rango(grafo, parametros[0], int(parametros[1])))
@@ -68,7 +68,6 @@ if __name__ == "__main__":
 #                       1                   2                       3               1               1           
     dicc_comandos = {"camino": camino, "conectados": conectados,"ciclo": ciclo, "rango": rango, "navegacion": navegacion, "listar_operaciones": listar}
 
-
     for line in sys.stdin: #lee linea
         line = line.replace('\n', '') #elimina los \n
         palabras = line.split(',') #separa las palabras
@@ -76,5 +75,11 @@ if __name__ == "__main__":
         palabras.pop(0)
         funcion = aux.pop(0)
         palabras.insert(0, " ".join(aux))
+        if funcion not in dicc_comandos:
+            print("comando inexistente")
+            continue
         comando = dicc_comandos[funcion]
-        comando(red, palabras)
+        try:
+            comando(red, palabras)
+        except:
+            print(str(funcion) + " fallo")

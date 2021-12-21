@@ -159,4 +159,3 @@ def conectados(grafo, pagina): # 2 ESTRELLAS: no anda
     mb = {}
     pila = deque()
     return conectados_(grafo, pagina, visitados, apilados, orden, mb, pila)
-

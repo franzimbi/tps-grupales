@@ -7,6 +7,7 @@
 
 typedef void (*comando_t)(global_t*);
 
+char* leer_linea(FILE* f);
 hash_t* iniciar_diccionario();
 void cerrar_diccionario(hash_t* diccionario);
 comando_t buscar_comando(hash_t* diccionario, char* clave);

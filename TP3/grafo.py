@@ -6,6 +6,9 @@ class Grafo:
         self._vertices = {}
         self._datos = {}
 
+    def __len__(self):
+        return len(self._vertices)
+    
     """inserta un vertice. si ese vertice existe, reemplaza el dato"""
     def insertar_vertice(self, vertice, dato=None):
         if vertice is not self._vertices:
